@@ -3,10 +3,8 @@
 {% block title %}Cleanup - Idea Bank{% endblock %}
 
 {% block content %}
-<h2 class="text-2xl font-bold mb-4">Cleanup Ideas</h2>
-
 <div class="overflow-x-auto">
-    <table class="table table-zebra w-full">
+    <table class="table w-full">
         <thead>
             <tr>
                 <th>Idea</th>
@@ -29,7 +27,7 @@
                 <td><span class="editable" data-field="effort">{{ idea.effort }}</span></td>
                 <td><span class="editable" data-field="upside">{{ idea.upside }}</span></td>
                 <td><span class="editable" data-field="downside">{{ idea.downside }}</span></td>
-                <td><span class="editable" data-field="competitors">{{ idea.competitors}}</span></td>
+                <td><span class="editable" data-field="competitors">{{ idea.competitors }}</span></td>
                 <td><span data-field="category">{{ idea.category }}</span></td>
                 <td>
                     <button class="btn btn-xs btn-error delete-btn">Delete</button>
@@ -43,98 +41,99 @@
 
 {% block extra_body %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const table = document.querySelector('table');
-
-    table.addEventListener('click', function(e) {
-        const target = e.target;
-        if (target.classList.contains('editable')) {
-            const text = target.textContent;
-            const input = document.createElement('input');
-            input.value = text;
-            input.className = 'input input-bordered input-sm w-full';
-            target.parentNode.replaceChild(input, target);
-            input.focus();
-
-            input.addEventListener('blur', function() {
-                const span = document.createElement('span');
-                span.textContent = this.value;
-                span.className = 'editable';
-                span.dataset.field = target.dataset.field;
-                this.parentNode.replaceChild(span, this);
-                updateIdea(span);
-            });
-
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    this.blur();
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.querySelector('table');
+    
+        table.addEventListener('click', function(e) {
+            const target = e.target;
+            if (target.classList.contains('editable')) {
+                const text = target.textContent;
+                const input = document.createElement('input');
+                input.value = text;
+                input.className = 'input input-bordered input-sm w-full';
+                input.dataset.field = target.dataset.field;
+                target.parentNode.replaceChild(input, target);
+                input.focus();
+    
+                input.addEventListener('blur', function() {
+                    const span = document.createElement('span');
+                    span.textContent = this.value;
+                    span.className = 'editable';
+                    span.dataset.field = this.dataset.field;
+                    this.parentNode.replaceChild(span, this);
+                    updateIdea(span);
+                });
+    
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        this.blur();
+                    }
+                });
+            } else if (target.classList.contains('delete-btn')) {
+                if (confirm('Are you sure you want to delete this idea?')) {
+                    deleteIdea(target.closest('tr'));
+                }
+            }
+        });
+    
+        function updateIdea(element) {
+            const row = element.closest('tr');
+            const ideaId = row.dataset.id;
+            const field = element.dataset.field;
+            let value = element.textContent;
+    
+            fetch(`/update-idea/${ideaId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ field, value })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Idea updated successfully');
+                } else {
+                    console.error('Failed to update idea');
                 }
             });
-        } else if (target.classList.contains('delete-btn')) {
-            if (confirm('Are you sure you want to delete this idea?')) {
-                deleteIdea(target.closest('tr'));
+        }
+    
+        function deleteIdea(row) {
+            const ideaId = row.dataset.id;
+    
+            fetch(`/delete-idea/${ideaId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    row.remove();
+                    console.log('Idea deleted successfully');
+                } else {
+                    console.error('Failed to delete idea');
+                }
+            });
+        }
+    
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
             }
+            return cookieValue;
         }
     });
-
-    function updateIdea(element) {
-        const row = element.closest('tr');
-        const ideaId = row.dataset.id;
-        const field = element.dataset.field;
-        const value = element.textContent;
-
-        fetch(`/update-idea/${ideaId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({ field, value })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                console.log('Idea updated successfully');
-            } else {
-                console.error('Failed to update idea');
-            }
-        });
-    }
-
-    function deleteIdea(row) {
-        const ideaId = row.dataset.id;
-
-        fetch(`/delete-idea/${ideaId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                row.remove();
-                console.log('Idea deleted successfully');
-            } else {
-                console.error('Failed to delete idea');
-            }
-        });
-    }
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-});
 </script>
 {% endblock %}

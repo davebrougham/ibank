@@ -11,3 +11,10 @@ class IdeaForm(forms.ModelForm):
         for field in self.fields:
             if field not in ['name', 'description']:
                 self.fields[field].required = False
+                
+    def clean(self):
+        cleaned_data = super().clean()
+        for field in self.fields:
+            if cleaned_data.get(field) == '':
+                cleaned_data[field] = None
+        return cleaned_data

@@ -12,7 +12,7 @@ def ideas(request):
     return render(request, 'ideas.html', {'ideas': ideas})
 
 def cleanup(request):
-    ideas = Idea.objects.filter(category__isnull=True)
+    ideas = Idea.objects.all()
     return render(request, 'cleanup.html', {'ideas': ideas})
 
 def data(request):
