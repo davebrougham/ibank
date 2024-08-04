@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Ideas - Idea Bank{% endblock %}
+
+{% block content %}
+<div class="overflow-x-auto">
+    <table class="table table-zebra w-full">
+        <thead>
+            <tr>
+                <th>Idea</th>
+                <th>Description</th>
+                <th>Complexity</th>
+                <th>Effort</th>
+                <th>Upside</th>
+                <th>Downside</th>
+                <th>Competitors</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for idea in ideas %}
+            <tr>
+                <td>{{ idea.name }}</td>
+                <td>{{ idea.description }}</td>
+                <td>{{ idea.complexity }}</td>
+                <td>{{ idea.effort }}</td>
+                <td>{{ idea.upside }}</td>
+                <td>{{ idea.downside }}</td>
+                <td>{{ idea.competitors }}</td>
+                <td>{{ idea.category }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

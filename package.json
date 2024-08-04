@@ -1,0 +1,16 @@
+{
+  "name": "ibank",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tailwindcss -i bank/static/css/input.css -o bank/static/css/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "daisyui": "^4.12.10",
+    "tailwindcss": "^3.4.7"
+  }
+}
