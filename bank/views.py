@@ -12,8 +12,13 @@ def ideas(request):
     return render(request, 'ideas.html', {'ideas': ideas})
 
 def cleanup(request):
-    ideas = Idea.objects.all()
-    return render(request, 'cleanup.html', {'ideas': ideas})
+    ideas = Idea.objects.all().order_by('complexity')
+    
+    context = {
+        "ideas": ideas,
+    }
+    
+    return render(request, "cleanup.html", context)
 
 def data(request):
     if request.method == 'POST':
@@ -33,8 +38,8 @@ def update_idea(request, idea_id):
         idea = Idea.objects.get(id=idea_id)
         data = json.loads(request.body)
         setattr(idea, data['field'], data['value'])
-        idea.save()
-        return JsonResponse({'status': 'success'})
+        category_changed = idea.save()  # This now returns whether the category changed
+        return JsonResponse({'status': 'success', 'category_changed': category_changed})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
 

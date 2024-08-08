@@ -93,7 +93,9 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    console.log('Idea updated successfully');
+                    if (data.category_changed) {
+                        location.reload();
+                    }
                 } else {
                     console.error('Failed to update idea');
                 }
@@ -113,7 +115,6 @@
             .then(data => {
                 if (data.status === 'success') {
                     row.remove();
-                    console.log('Idea deleted successfully');
                 } else {
                     console.error('Failed to delete idea');
                 }
