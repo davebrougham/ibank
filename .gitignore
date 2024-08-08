@@ -1,2 +1,26 @@
 .DS_Store
 db.sqlite3
+
+# Elastic Beanstalk Files
+# .elasticbeanstalk/*
+# !.elasticbeanstalk/*.cfg.yml
+# !.elasticbeanstalk/*.global.yml
+
+# Redis store
+dump.rdb
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore other common files
+*.log
+*.sqlite3
+*.swp
+*.bak
+*.DS_Store
+
+# secrets
+.env
