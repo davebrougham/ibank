@@ -4,7 +4,7 @@ from .models import Idea
 class IdeaForm(forms.ModelForm):
     class Meta:
         model = Idea
-        fields = ['name', 'description', 'complexity', 'effort', 'upside', 'downside', 'competitors']
+        fields = ['name', 'description', 'complexity', 'effort', 'upside', 'downside']
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

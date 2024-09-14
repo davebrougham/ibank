@@ -26,7 +26,6 @@ class Idea(models.Model):
     complexity = models.IntegerField(default=None, null=True)
     effort = models.IntegerField(default=None, null=True)
     upside = models.IntegerField(default=None, null=True)
-    
     downside = models.IntegerField(default=None, null=True)
     competitors = models.TextField(default=None, null=True)
     category = models.CharField(max_length=200, default=None, null=True, choices=CATEGORY_CHOICES)
