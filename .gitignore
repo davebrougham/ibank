@@ -11,9 +11,8 @@ dump.rdb
 
 # Ignore Python cache files
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
 
 # Ignore other common files
 *.log
