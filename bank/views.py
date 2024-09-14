@@ -6,30 +6,26 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Idea
 import json
 
-
-def ideas(request):
+def dashboard(request):
     ideas = Idea.objects.filter(category__isnull=False)
-    return render(request, 'ideas.html', {'ideas': ideas})
+    return render(request, 'dashboard.html', {'ideas': ideas})
 
-def cleanup(request):
+def workshop(request):
     ideas = Idea.objects.all().order_by('complexity')
-    
     context = {
         "ideas": ideas,
     }
-    
-    return render(request, "cleanup.html", context)
+    return render(request, "workshop.html", context)
 
-def data(request):
+def create(request):
     if request.method == 'POST':
         form = IdeaForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('cleanup')
+            return redirect('workshop')
     else:
         form = IdeaForm()
-    
-    return render(request, 'data.html', {'form': form})
+    return render(request, 'create.html', {'form': form})
 
 @require_POST
 @csrf_exempt
