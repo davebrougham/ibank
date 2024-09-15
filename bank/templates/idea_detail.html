@@ -24,7 +24,7 @@
 
         <div class="grid grid-cols-2 gap-8 mb-8">
             <div>
-                <h3 class="text-xl font-semibold mb-4 text-white">{{ idea.category }}</h3>
+                <h3 class="text-xl font-semibold mb-4 text-white">{{ idea.get_category_display }}</h3>
                 <div class="mb-4">
                     <label for="{{ form.complexity.id_for_label }}" class="block text-sm font-medium text-white mb-2">Complexity</label>
                     <input type="text" name="{{ form.complexity.name }}" id="{{ form.complexity.id_for_label }}" value="{{ form.complexity.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -59,7 +59,7 @@
         </div>
 
         <div class="mb-8">
-            <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-white mb-2">Notes</label>
+            <label for="{{ form.notes.id_for_label }}" class="block text-xl font-semibold text-white mb-4">Notes</label>
             <textarea name="{{ form.notes.name }}" id="{{ form.notes.id_for_label }}" rows="4" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.notes.value|default:'' }}</textarea>
         </div>
 
@@ -70,7 +70,6 @@
     </form>
     
     <div id="idea-view" class="mb-8">
-        <!-- View mode content will be populated by JavaScript -->
     </div>
     
     <div class="text-gray-300 mt-8">
@@ -102,11 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <div class="grid grid-cols-2 gap-8 mb-8">
                 <div>
-                    <h3 class="text-xl font-semibold mb-4 text-white">{{ idea.category }}</h3>
-                    <p class="text-white mb-2"><strong>Complexity:</strong> ${document.getElementById('{{ form.complexity.id_for_label }}').value}</p>
-                    <p class="text-white mb-2"><strong>Effort:</strong> ${document.getElementById('{{ form.effort.id_for_label }}').value}</p>
-                    <p class="text-white mb-2"><strong>Upside:</strong> ${document.getElementById('{{ form.upside.id_for_label }}').value}</p>
-                    <p class="text-white mb-2"><strong>Downside:</strong> ${document.getElementById('{{ form.downside.id_for_label }}').value}</p>
+                    <h3 class="text-xl font-semibold mb-4 text-white">{{ idea.get_category_display }}</h3>
+                    <p class="text-white mb-2">Complexity: ${document.getElementById('{{ form.complexity.id_for_label }}').value}</p>
+                    <p class="text-white mb-2">Effort: ${document.getElementById('{{ form.effort.id_for_label }}').value}</p>
+                    <p class="text-white mb-2">Upside: ${document.getElementById('{{ form.upside.id_for_label }}').value}</p>
+                    <p class="text-white mb-2">Downside: ${document.getElementById('{{ form.downside.id_for_label }}').value}</p>
                 </div>
                 <div>
                     <h2 class="text-xl font-semibold mb-4 text-white">Useful Links</h2>

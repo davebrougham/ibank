@@ -39,7 +39,6 @@ class Idea(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     notes = models.TextField(blank=True, null=True)
-    links = models.ManyToManyField(Link, blank=True, null=True)
     
     class Meta:
         db_table = 'idea'
