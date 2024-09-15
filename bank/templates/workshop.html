@@ -19,7 +19,7 @@
         </thead>
         <tbody id="sortable-ideas">
             {% for idea in ideas %}
-            <tr data-id="{{ idea.id }}">
+            <tr data-id="{{ idea.id }}" class="hover:bg-gray-700 transition-colors duration-150 ease-in-out cursor-move border-b border-gray-600">
                 <td>{{ idea.name }}</td>
                 <td>{{ idea.description|truncatewords:20 }}</td>
                 <td>{{ idea.complexity }}</td>
