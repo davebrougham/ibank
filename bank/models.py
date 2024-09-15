@@ -43,7 +43,7 @@ class Idea(models.Model):
 
     class Meta:
         db_table = 'idea'
-        ordering = ['order']  # This will make queries return ideas in order by default
+        ordering = ['order']
 
     def __str__(self):
         return self.name
