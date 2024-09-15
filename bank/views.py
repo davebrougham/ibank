@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import IdeaForm 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
 from .models import Idea
 import json
 
@@ -28,7 +27,6 @@ def create(request):
     return render(request, 'create.html', {'form': form})
 
 @require_POST
-@csrf_exempt
 def update_idea(request, idea_id):
     try:
         idea = Idea.objects.get(id=idea_id)
@@ -40,7 +38,6 @@ def update_idea(request, idea_id):
         return JsonResponse({'status': 'error', 'message': str(e)})
 
 @require_POST
-@csrf_exempt
 def delete_idea(request, idea_id):
     try:
         idea = Idea.objects.get(id=idea_id)
