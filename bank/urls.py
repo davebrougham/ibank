@@ -12,4 +12,5 @@ urlpatterns = [
     # path('idea/<int:idea_id>/add-link/', views.add_link, name='add_link'),
     # path('delete-link/<int:link_id>/', views.delete_link, name='delete_link'),
     # path('update-notes/<int:idea_id>/', views.update_notes, name='update_notes'),
+    path('update-idea-order/', views.update_idea_order, name='update_idea_order'),
 ]

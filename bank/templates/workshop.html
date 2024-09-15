@@ -17,9 +17,9 @@
                 <th class="text-lg font-semibold">Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="sortable-ideas">
             {% for idea in ideas %}
-            <tr>
+            <tr data-id="{{ idea.id }}">
                 <td>{{ idea.name }}</td>
                 <td>{{ idea.description|truncatewords:20 }}</td>
                 <td>{{ idea.complexity }}</td>
@@ -42,6 +42,17 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const table = document.querySelector('table');
+        const sortableList = document.getElementById('sortable-ideas');
+    
+        // Initialize Sortable
+        new Sortable(sortableList, {
+            animation: 150,
+            onEnd: function (evt) {
+                const itemEl = evt.item;
+                const newIndex = evt.newIndex;
+                updateIdeaOrder(itemEl.dataset.id, newIndex);
+            }
+        });
     
         table.addEventListener('click', function(e) {
             if (e.target.classList.contains('delete-btn')) {
@@ -66,6 +77,26 @@
                     button.closest('tr').remove();
                 } else {
                     console.error('Failed to delete idea');
+                }
+            });
+        }
+    
+        function updateIdeaOrder(ideaId, newIndex) {
+            fetch(`/update-idea-order/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    ideaId: ideaId,
+                    newIndex: newIndex
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status !== 'success') {
+                    console.error('Failed to update idea order');
                 }
             });
         }

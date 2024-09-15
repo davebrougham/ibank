@@ -1,3 +1,4 @@
+from django.views.decorators.http import require_POST
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.forms import inlineformset_factory
@@ -10,7 +11,7 @@ def dashboard(request):
     return render(request, 'dashboard.html', {'ideas': ideas})
 
 def workshop(request):
-    ideas = Idea.objects.all().order_by('complexity')
+    ideas = Idea.objects.all().order_by('order')
     context = {
         "ideas": ideas,
     }
@@ -83,3 +84,31 @@ def idea_detail(request, idea_id):
         'form': form,
         'link_formset': link_formset,
     })
+
+@require_POST
+def update_idea_order(request):
+    try:
+        data = json.loads(request.body)
+        idea_id = data['ideaId']
+        new_index = data['newIndex']
+
+        idea = Idea.objects.get(id=idea_id)
+        old_index = idea.order
+
+        if new_index > old_index:
+            Idea.objects.filter(
+                order__gt=old_index,
+                order__lte=new_index
+            ).update(order=F('order') - 1)
+        else:
+            Idea.objects.filter(
+                order__gte=new_index,
+                order__lt=old_index
+            ).update(order=F('order') + 1)
+
+        idea.order = new_index
+        idea.save()
+
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})

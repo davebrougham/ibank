@@ -39,10 +39,12 @@ class Idea(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     notes = models.TextField(blank=True, null=True)
-    
+    order = models.IntegerField(default=0)
+
     class Meta:
         db_table = 'idea'
-    
+        ordering = ['order']  # This will make queries return ideas in order by default
+
     def __str__(self):
         return self.name
         
