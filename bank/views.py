@@ -7,22 +7,18 @@ from .forms import IdeaForm
 import json
 
 def dashboard(request):
-    ideas = Idea.objects.filter(category__isnull=False)
-    return render(request, 'dashboard.html', {'ideas': ideas})
-
-def workshop(request):
     ideas = Idea.objects.all().order_by('order')
     context = {
         "ideas": ideas,
     }
-    return render(request, "workshop.html", context)
+    return render(request, "dashboard.html", context)
 
 def create(request):
     if request.method == 'POST':
         form = IdeaForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('workshop')
+            return redirect('dashboard')
     else:
         form = IdeaForm()
     return render(request, 'create.html', {'form': form})
