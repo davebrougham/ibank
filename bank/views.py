@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import IdeaForm 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from .models import Idea
+from .models import Idea, Link
 import json
 
 def dashboard(request):
@@ -49,3 +49,36 @@ def delete_idea(request, idea_id):
 def idea_detail(request, idea_id):
     idea = get_object_or_404(Idea, id=idea_id)
     return render(request, 'idea_detail.html', {'idea': idea})
+
+@require_POST
+def add_link(request, idea_id):
+    try:
+        idea = Idea.objects.get(id=idea_id)
+        data = json.loads(request.body)
+        link = Link.objects.create(
+            idea=idea,
+            url=data['url']
+        )
+        return JsonResponse({'status': 'success', 'id': link.id})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+@require_POST
+def delete_link(request, link_id):
+    try:
+        link = Link.objects.get(id=link_id)
+        link.delete()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+@require_POST
+def update_notes(request, idea_id):
+    try:
+        idea = Idea.objects.get(id=idea_id)
+        data = json.loads(request.body)
+        idea.notes = data['notes']
+        idea.save()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})

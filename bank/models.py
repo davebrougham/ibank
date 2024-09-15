@@ -7,6 +7,13 @@ CATEGORY_CHOICES = [
     ("hard-small-wins", "Hard Small Wins"),
 ]    
 
+class Link(models.Model):
+    idea = models.ForeignKey('Idea', related_name='links', on_delete=models.CASCADE)
+    url = models.URLField()
+
+    def __str__(self):
+        return self.url
+
 class Idea(models.Model):
     """
     Complexity 1-4 Low is good. 
@@ -31,6 +38,7 @@ class Idea(models.Model):
     category = models.CharField(max_length=200, default=None, null=True, choices=CATEGORY_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    notes = models.TextField(blank=True, null=True)
     
     class Meta:
         db_table = 'idea'

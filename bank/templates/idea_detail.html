@@ -31,6 +31,27 @@
                 <span class="editable-value">{{ idea.downside }}</span>
             </p>
         </div>
+        <div>
+            <h2 class="text-xl font-semibold mb-2">Useful Links</h2>
+            <ul id="links" class="space-y-2">
+                {% for link in idea.links.all %}
+                    <li class="flex items-center justify-between">
+                        <a href="{{ link.url }}" target="_blank" class="text-blue-500 hover:underline truncate mr-2 flex-grow">{{ link.url }}</a>
+                        <button class="btn btn-sm btn-error delete-link" data-link-id="{{ link.id }}">Delete</button>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="mt-2 flex items-center">
+                <input type="url" id="link-url" placeholder="https://example.com" class="input input-bordered input-sm flex-grow mr-2">
+                <button id="add-link" class="btn btn-sm btn-primary whitespace-nowrap">Add Link</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mb-4">
+        <h2 class="text-xl font-semibold mb-2">Notes</h2>
+        <textarea id="notes" class="textarea textarea-bordered w-full" rows="5">{{ idea.notes | default:"" }}</textarea>
+        <button id="save-notes" class="btn btn-sm btn-primary mt-2">Save Notes</button>
     </div>
     
     <div>
@@ -115,6 +136,80 @@
                 });
             });
         });
+        
+        document.getElementById('add-link').addEventListener('click', function() {
+            const url = document.getElementById('link-url').value;
+            if (url) {
+                addLink(url);
+            }
+        });
+        
+        document.getElementById('links').addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-link')) {
+                const linkId = e.target.dataset.linkId;
+                deleteLink(linkId);
+            }
+        });
+        
+        document.getElementById('save-notes').addEventListener('click', function() {
+            const notes = document.getElementById('notes').value;
+            saveNotes(notes);
+        });
+        
+        function addLink(url) {
+            fetch(`/add-link/{{ idea.id }}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ url })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    console.error('Failed to add link');
+                }
+            });
+        }
+        
+        function deleteLink(linkId) {
+            fetch(`/delete-link/${linkId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    console.error('Failed to delete link');
+                }
+            });
+        }
+        
+        function saveNotes(notes) {
+            fetch(`/update-notes/{{ idea.id }}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ notes })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Notes saved successfully');
+                } else {
+                    console.error('Failed to save notes');
+                }
+            });
+        }
         
         function updateIdea(element) {
             const field = element.dataset.field || element.parentNode.dataset.field;
