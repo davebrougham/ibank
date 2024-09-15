@@ -4,24 +4,32 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-4">{{ idea.name }}</h1>
+    <h1 class="text-3xl font-bold mb-4"><span class="editable" data-field="name">{{ idea.name }}</span></h1>
     
     <div class="mb-4">
         <h2 class="text-xl font-semibold mb-2">Description</h2>
-        <p class="whitespace-pre-wrap">{{ idea.description }}</p>
+        <p class="whitespace-pre-wrap editable" data-field="description">{{ idea.description }}</p>
     </div>
     
     <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
-            <h2 class="text-xl font-semibold mb-2">Details</h2>
-            <p><strong>Complexity:</strong> <span class="editable" data-field="complexity">{{ idea.complexity }}</span></p>
-            <p><strong>Effort:</strong> <span class="editable" data-field="effort">{{ idea.effort }}</span></p>
-            <p><strong>Upside:</strong> <span class="editable" data-field="upside">{{ idea.upside }}</span></p>
-            <p><strong>Downside:</strong> <span class="editable" data-field="downside">{{ idea.downside }}</span></p>
-        </div>
-        <div>
-            <h2 class="text-xl font-semibold mb-2">Category</h2>
-            <p>{{ idea.category }}</p>
+            <h2 class="text-xl font-semibold mb-2">{{ idea.category }}</h2>
+            <p class="editable-field flex items-center space-x-2" data-field="complexity">
+                <span>Complexity:</span>
+                <span class="editable-value">{{ idea.complexity }}</span>
+            </p>
+            <p class="editable-field flex items-center space-x-2" data-field="effort">
+                <span>Effort:</span>
+                <span class="editable-value">{{ idea.effort }}</span>
+            </p>
+            <p class="editable-field flex items-center space-x-2" data-field="upside">
+                <span>Upside:</span>
+                <span class="editable-value">{{ idea.upside }}</span>
+            </p>
+            <p class="editable-field flex items-center space-x-2" data-field="downside">
+                <span>Downside:</span>
+                <span class="editable-value">{{ idea.downside }}</span>
+            </p>
         </div>
     </div>
     
@@ -35,29 +43,73 @@
 {% block extra_body %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const editables = document.querySelectorAll('.editable');
+        const editables = document.querySelectorAll('.editable, .editable-field');
         
         editables.forEach(editable => {
             editable.addEventListener('click', function() {
-                const text = this.textContent;
-                const input = document.createElement('input');
-                input.value = text;
-                input.className = 'input input-bordered input-sm w-full';
-                input.dataset.field = this.dataset.field;
-                this.parentNode.replaceChild(input, this);
-                input.focus();
+                const field = this.dataset.field;
+                let valueElement, text;
                 
-                input.addEventListener('blur', function() {
-                    const span = document.createElement('span');
-                    span.textContent = this.value;
-                    span.className = 'editable';
-                    span.dataset.field = this.dataset.field;
-                    this.parentNode.replaceChild(span, this);
-                    updateIdea(span);
-                });
+                if (this.classList.contains('editable-field')) {
+                    valueElement = this.querySelector('.editable-value');
+                    text = valueElement.textContent;
+                } else {
+                    valueElement = this;
+                    text = this.textContent;
+                }
                 
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
+                let inputElement;
+                if (field === 'description') {
+                    inputElement = document.createElement('textarea');
+                    inputElement.className = 'textarea textarea-bordered w-full min-h-[100px]';
+                    inputElement.style.height = 'auto';
+                    inputElement.style.height = inputElement.scrollHeight + 'px';
+                } else {
+                    inputElement = document.createElement('input');
+                    if (field === 'name') {
+                        inputElement.className = 'input input-bordered input-sm w-full max-w-md';
+                    } else {
+                        inputElement.className = 'input input-bordered input-sm w-24 min-w-[6rem] ml-2';
+                    }
+                }
+                
+                inputElement.value = text.trim();
+                inputElement.dataset.field = field;
+                
+                valueElement.parentNode.replaceChild(inputElement, valueElement);
+                inputElement.focus();
+                
+                if (field === 'description') {
+                    inputElement.addEventListener('input', function() {
+                        this.style.height = 'auto';
+                        this.style.height = this.scrollHeight + 'px';
+                    });
+                }
+                
+                const blurHandler = function() {
+                    const newElement = document.createElement(field === 'description' ? 'p' : 'span');
+                    newElement.textContent = this.value;
+                    
+                    if (this.parentNode.classList.contains('editable-field')) {
+                        newElement.className = 'editable-value';
+                    } else {
+                        newElement.className = 'editable';
+                        newElement.dataset.field = field;
+                    }
+                    
+                    if (field === 'description') {
+                        newElement.className += ' whitespace-pre-wrap';
+                    }
+                    
+                    this.parentNode.replaceChild(newElement, this);
+                    updateIdea(newElement);
+                };
+                
+                inputElement.addEventListener('blur', blurHandler);
+                
+                inputElement.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey && field !== 'description') {
+                        e.preventDefault();
                         this.blur();
                     }
                 });
@@ -65,7 +117,7 @@
         });
         
         function updateIdea(element) {
-            const field = element.dataset.field;
+            const field = element.dataset.field || element.parentNode.dataset.field;
             const value = element.textContent;
             const ideaId = {{ idea.id }};
             
