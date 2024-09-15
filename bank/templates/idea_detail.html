@@ -3,253 +3,167 @@
 {% block title %}{{ idea.name }} - Idea Bank{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-4"><span class="editable" data-field="name">{{ idea.name }}</span></h1>
-    
-    <div class="mb-4">
-        <h2 class="text-xl font-semibold mb-2">Description</h2>
-        <p class="whitespace-pre-wrap editable" data-field="description">{{ idea.description }}</p>
+<div class="max-w-4xl mx-auto p-4 font-sans">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-white">{{ idea.name }}</h1>
+        <button id="edit-button" class="btn btn-primary">Edit</button>
     </div>
     
-    <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-            <h2 class="text-xl font-semibold mb-2">{{ idea.category }}</h2>
-            <p class="editable-field flex items-center space-x-2" data-field="complexity">
-                <span>Complexity:</span>
-                <span class="editable-value">{{ idea.complexity }}</span>
-            </p>
-            <p class="editable-field flex items-center space-x-2" data-field="effort">
-                <span>Effort:</span>
-                <span class="editable-value">{{ idea.effort }}</span>
-            </p>
-            <p class="editable-field flex items-center space-x-2" data-field="upside">
-                <span>Upside:</span>
-                <span class="editable-value">{{ idea.upside }}</span>
-            </p>
-            <p class="editable-field flex items-center space-x-2" data-field="downside">
-                <span>Downside:</span>
-                <span class="editable-value">{{ idea.downside }}</span>
-            </p>
+    <form id="idea-form" method="post" class="mb-8 hidden">
+        {% csrf_token %}
+        
+        <div class="mb-8">
+            <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-white mb-2">Name</label>
+            <input type="text" name="{{ form.name.name }}" id="{{ form.name.id_for_label }}" value="{{ form.name.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-        <div>
-            <h2 class="text-xl font-semibold mb-2">Useful Links</h2>
-            <ul id="links" class="space-y-2">
-                {% for link in idea.links.all %}
-                    <li class="flex items-center justify-between">
-                        <a href="{{ link.url }}" target="_blank" class="text-blue-500 hover:underline truncate mr-2 flex-grow">{{ link.url }}</a>
-                        <button class="btn btn-sm btn-error delete-link" data-link-id="{{ link.id }}">Delete</button>
-                    </li>
-                {% endfor %}
-            </ul>
-            <div class="mt-2 flex items-center">
-                <input type="url" id="link-url" placeholder="https://example.com" class="input input-bordered input-sm flex-grow mr-2">
-                <button id="add-link" class="btn btn-sm btn-primary whitespace-nowrap">Add Link</button>
+
+        <div class="mb-8">
+            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-white mb-2">Description</label>
+            <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" rows="3" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.description.value|default:'' }}</textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8 mb-8">
+            <div>
+                <h3 class="text-xl font-semibold mb-4 text-white">{{ idea.category }}</h3>
+                <div class="mb-4">
+                    <label for="{{ form.complexity.id_for_label }}" class="block text-sm font-medium text-white mb-2">Complexity</label>
+                    <input type="text" name="{{ form.complexity.name }}" id="{{ form.complexity.id_for_label }}" value="{{ form.complexity.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="{{ form.effort.id_for_label }}" class="block text-sm font-medium text-white mb-2">Effort</label>
+                    <input type="text" name="{{ form.effort.name }}" id="{{ form.effort.id_for_label }}" value="{{ form.effort.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="{{ form.upside.id_for_label }}" class="block text-sm font-medium text-white mb-2">Upside</label>
+                    <input type="text" name="{{ form.upside.name }}" id="{{ form.upside.id_for_label }}" value="{{ form.upside.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="{{ form.downside.id_for_label }}" class="block text-sm font-medium text-white mb-2">Downside</label>
+                    <input type="text" name="{{ form.downside.name }}" id="{{ form.downside.id_for_label }}" value="{{ form.downside.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            <div id="links-section">
+                <h2 class="text-xl font-semibold mb-4 text-white">Useful Links</h2>
+                {{ link_formset.management_form }}
+                <ul class="space-y-2" id="links-list">
+                    {% for link_form in link_formset %}
+                        <li class="flex items-center justify-between">
+                            {{ link_form.id }}
+                            <input type="url" name="{{ link_form.url.html_name }}" id="{{ link_form.url.id_for_label }}" value="{{ link_form.url.value|default:'' }}" class="flex-grow px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2">
+                            <button type="button" class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 delete-link">Delete</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <button type="button" id="add-link" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Add Link</button>
             </div>
         </div>
+
+        <div class="mb-8">
+            <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-white mb-2">Notes</label>
+            <textarea name="{{ form.notes.name }}" id="{{ form.notes.id_for_label }}" rows="4" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.notes.value|default:'' }}</textarea>
+        </div>
+
+        <div class="flex justify-end space-x-2">
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Save Changes</button>
+            <button type="button" id="discard-button" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">Discard Changes</button>
+        </div>
+    </form>
+    
+    <div id="idea-view" class="mb-8">
+        <!-- View mode content will be populated by JavaScript -->
     </div>
     
-    <div class="mb-4">
-        <h2 class="text-xl font-semibold mb-2">Notes</h2>
-        <textarea id="notes" class="textarea textarea-bordered w-full" rows="5">{{ idea.notes | default:"" }}</textarea>
-        <button id="save-notes" class="btn btn-sm btn-primary mt-2">Save Notes</button>
-    </div>
-    
-    <div>
+    <div class="text-gray-300 mt-8">
         <p><strong>Created:</strong> {{ idea.created_at|date:"F j, Y" }}</p>
         <p><strong>Last Updated:</strong> {{ idea.updated_at|date:"F j, Y" }}</p>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_body %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const editables = document.querySelectorAll('.editable, .editable-field');
-        
-        editables.forEach(editable => {
-            editable.addEventListener('click', function() {
-                const field = this.dataset.field;
-                let valueElement, text;
-                
-                if (this.classList.contains('editable-field')) {
-                    valueElement = this.querySelector('.editable-value');
-                    text = valueElement.textContent;
-                } else {
-                    valueElement = this;
-                    text = this.textContent;
-                }
-                
-                let inputElement;
-                if (field === 'description') {
-                    inputElement = document.createElement('textarea');
-                    inputElement.className = 'textarea textarea-bordered w-full min-h-[100px]';
-                    inputElement.style.height = 'auto';
-                    inputElement.style.height = inputElement.scrollHeight + 'px';
-                } else {
-                    inputElement = document.createElement('input');
-                    if (field === 'name') {
-                        inputElement.className = 'input input-bordered input-sm w-full max-w-md';
-                    } else {
-                        inputElement.className = 'input input-bordered input-sm w-24 min-w-[6rem] ml-2';
-                    }
-                }
-                
-                inputElement.value = text.trim();
-                inputElement.dataset.field = field;
-                
-                valueElement.parentNode.replaceChild(inputElement, valueElement);
-                inputElement.focus();
-                
-                if (field === 'description') {
-                    inputElement.addEventListener('input', function() {
-                        this.style.height = 'auto';
-                        this.style.height = this.scrollHeight + 'px';
-                    });
-                }
-                
-                const blurHandler = function() {
-                    const newElement = document.createElement(field === 'description' ? 'p' : 'span');
-                    newElement.textContent = this.value;
-                    
-                    if (this.parentNode.classList.contains('editable-field')) {
-                        newElement.className = 'editable-value';
-                    } else {
-                        newElement.className = 'editable';
-                        newElement.dataset.field = field;
-                    }
-                    
-                    if (field === 'description') {
-                        newElement.className += ' whitespace-pre-wrap';
-                    }
-                    
-                    this.parentNode.replaceChild(newElement, this);
-                    updateIdea(newElement);
-                };
-                
-                inputElement.addEventListener('blur', blurHandler);
-                
-                inputElement.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey && field !== 'description') {
-                        e.preventDefault();
-                        this.blur();
-                    }
-                });
-            });
-        });
-        
-        document.getElementById('add-link').addEventListener('click', function() {
-            const url = document.getElementById('link-url').value;
-            if (url) {
-                addLink(url);
-            }
-        });
-        
-        document.getElementById('links').addEventListener('click', function(e) {
-            if (e.target.classList.contains('delete-link')) {
-                const linkId = e.target.dataset.linkId;
-                deleteLink(linkId);
-            }
-        });
-        
-        document.getElementById('save-notes').addEventListener('click', function() {
-            const notes = document.getElementById('notes').value;
-            saveNotes(notes);
-        });
-        
-        function addLink(url) {
-            fetch(`/add-link/{{ idea.id }}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ url })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    location.reload();
-                } else {
-                    console.error('Failed to add link');
-                }
-            });
-        }
-        
-        function deleteLink(linkId) {
-            fetch(`/delete-link/${linkId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    location.reload();
-                } else {
-                    console.error('Failed to delete link');
-                }
-            });
-        }
-        
-        function saveNotes(notes) {
-            fetch(`/update-notes/{{ idea.id }}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ notes })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    console.log('Notes saved successfully');
-                } else {
-                    console.error('Failed to save notes');
-                }
-            });
-        }
-        
-        function updateIdea(element) {
-            const field = element.dataset.field || element.parentNode.dataset.field;
-            const value = element.textContent;
-            const ideaId = {{ idea.id }};
+document.addEventListener('DOMContentLoaded', function() {
+    const editButton = document.getElementById('edit-button');
+    const ideaForm = document.getElementById('idea-form');
+    const ideaView = document.getElementById('idea-view');
+    const discardButton = document.getElementById('discard-button');
+    const linksSection = document.getElementById('links-section');
+    const addLinkButton = document.getElementById('add-link');
+    const linksList = document.getElementById('links-list');
+
+    function toggleEditMode() {
+        ideaForm.classList.toggle('hidden');
+        ideaView.classList.toggle('hidden');
+        editButton.textContent = ideaForm.classList.contains('hidden') ? 'Edit' : 'Cancel';
+    }
+
+    function updateViewMode() {
+        const viewHTML = `
+            <h2 class="text-2xl font-semibold mb-4 text-white">Description</h2>
+            <p class="text-white mb-8">${document.getElementById('{{ form.description.id_for_label }}').value}</p>
             
-            fetch(`/update-idea/${ideaId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ field, value })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    if (data.category_changed) {
-                        location.reload();
-                    }
-                } else {
-                    console.error('Failed to update idea');
-                }
-            });
-        }
-        
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
+            <div class="grid grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-white">{{ idea.category }}</h3>
+                    <p class="text-white mb-2"><strong>Complexity:</strong> ${document.getElementById('{{ form.complexity.id_for_label }}').value}</p>
+                    <p class="text-white mb-2"><strong>Effort:</strong> ${document.getElementById('{{ form.effort.id_for_label }}').value}</p>
+                    <p class="text-white mb-2"><strong>Upside:</strong> ${document.getElementById('{{ form.upside.id_for_label }}').value}</p>
+                    <p class="text-white mb-2"><strong>Downside:</strong> ${document.getElementById('{{ form.downside.id_for_label }}').value}</p>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold mb-4 text-white">Useful Links</h2>
+                    <ul class="space-y-2">
+                        ${Array.from(linksList.querySelectorAll('input[type="url"]')).map(input => 
+                            `<li><a href="${input.value}" target="_blank" class="text-blue-400 hover:underline">${input.value}</a></li>`
+                        ).join('')}
+                    </ul>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-semibold mb-4 text-white">Notes</h2>
+            <p class="text-white">${document.getElementById('{{ form.notes.id_for_label }}').value}</p>
+        `;
+        ideaView.innerHTML = viewHTML;
+    }
+
+    editButton.addEventListener('click', toggleEditMode);
+    discardButton.addEventListener('click', function() {
+        toggleEditMode();
+        updateViewMode();
+    });
+
+    addLinkButton.addEventListener('click', function() {
+        const newLinkItem = document.createElement('li');
+        newLinkItem.className = 'flex items-center justify-between';
+        const totalForms = document.querySelector('#id_links-TOTAL_FORMS');
+        const newIndex = parseInt(totalForms.value);
+        newLinkItem.innerHTML = `
+            <input type="hidden" name="links-${newIndex}-id" id="id_links-${newIndex}-id">
+            <input type="url" name="links-${newIndex}-url" id="id_links-${newIndex}-url" class="flex-grow px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2">
+            <button type="button" class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 delete-link">Delete</button>
+        `;
+        linksList.appendChild(newLinkItem);
+        totalForms.value = newIndex + 1;
+    });
+
+    linksList.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-link')) {
+            e.target.closest('li').remove();
+            updateFormIndexes();
         }
     });
+
+    function updateFormIndexes() {
+        const linkItems = linksList.querySelectorAll('li');
+        linkItems.forEach((item, index) => {
+            item.querySelectorAll('input').forEach(input => {
+                input.name = input.name.replace(/\d+/, index);
+                input.id = input.id.replace(/\d+/, index);
+            });
+        });
+        document.querySelector('#id_links-TOTAL_FORMS').value = linkItems.length;
+    }
+
+    // Initialize view mode
+    updateViewMode();
+});
 </script>
 {% endblock %}
