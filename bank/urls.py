@@ -8,4 +8,5 @@ urlpatterns = [
     path(r"create/", views.create, name='create'),
     path('update-idea/<int:idea_id>/', views.update_idea, name='update_idea'),
     path('delete-idea/<int:idea_id>/', views.delete_idea, name='delete_idea'),
+    path('idea/<int:idea_id>/', views.idea_detail, name='idea_detail'),
 ]

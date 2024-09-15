@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}{{ idea.name }} - Idea Bank{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-4">{{ idea.name }}</h1>
+    
+    <div class="mb-4">
+        <h2 class="text-xl font-semibold mb-2">Description</h2>
+        <p class="whitespace-pre-wrap">{{ idea.description }}</p>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+            <h2 class="text-xl font-semibold mb-2">Details</h2>
+            <p><strong>Complexity:</strong> <span class="editable" data-field="complexity">{{ idea.complexity }}</span></p>
+            <p><strong>Effort:</strong> <span class="editable" data-field="effort">{{ idea.effort }}</span></p>
+            <p><strong>Upside:</strong> <span class="editable" data-field="upside">{{ idea.upside }}</span></p>
+            <p><strong>Downside:</strong> <span class="editable" data-field="downside">{{ idea.downside }}</span></p>
+        </div>
+        <div>
+            <h2 class="text-xl font-semibold mb-2">Category</h2>
+            <p>{{ idea.category }}</p>
+        </div>
+    </div>
+    
+    <div>
+        <p><strong>Created:</strong> {{ idea.created_at|date:"F j, Y" }}</p>
+        <p><strong>Last Updated:</strong> {{ idea.updated_at|date:"F j, Y" }}</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editables = document.querySelectorAll('.editable');
+        
+        editables.forEach(editable => {
+            editable.addEventListener('click', function() {
+                const text = this.textContent;
+                const input = document.createElement('input');
+                input.value = text;
+                input.className = 'input input-bordered input-sm w-full';
+                input.dataset.field = this.dataset.field;
+                this.parentNode.replaceChild(input, this);
+                input.focus();
+                
+                input.addEventListener('blur', function() {
+                    const span = document.createElement('span');
+                    span.textContent = this.value;
+                    span.className = 'editable';
+                    span.dataset.field = this.dataset.field;
+                    this.parentNode.replaceChild(span, this);
+                    updateIdea(span);
+                });
+                
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        this.blur();
+                    }
+                });
+            });
+        });
+        
+        function updateIdea(element) {
+            const field = element.dataset.field;
+            const value = element.textContent;
+            const ideaId = {{ idea.id }};
+            
+            fetch(`/update-idea/${ideaId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ field, value })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (data.category_changed) {
+                        location.reload();
+                    }
+                } else {
+                    console.error('Failed to update idea');
+                }
+            });
+        }
+        
+        function getCookie(name) {
+            // ... existing getCookie function ...
+        }
+    });
+</script>
+{% endblock %}

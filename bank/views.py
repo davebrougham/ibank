@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import IdeaForm 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -48,3 +48,7 @@ def delete_idea(request, idea_id):
         return JsonResponse({'status': 'success'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
+
+def idea_detail(request, idea_id):
+    idea = get_object_or_404(Idea, id=idea_id)
+    return render(request, 'idea_detail.html', {'idea': idea})

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Ideas - Idea Bank{% endblock %}
+{% block title %}Dashboard - Idea Bank{% endblock %}
 
 {% block content %}
 <div class="overflow-x-auto">
@@ -14,18 +14,22 @@
                 <th>Upside</th>
                 <th>Downside</th>
                 <th>Category</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for idea in ideas %}
             <tr>
                 <td>{{ idea.name }}</td>
-                <td>{{ idea.description }}</td>
+                <td>{{ idea.description|truncatewords:20 }}</td>
                 <td>{{ idea.complexity }}</td>
                 <td>{{ idea.effort }}</td>
                 <td>{{ idea.upside }}</td>
                 <td>{{ idea.downside }}</td>
-                <td>{{ idea.category }}</td>
+                <td>{{ idea.get_category_display }}</td>
+                <td>
+                    <a href="{% url 'idea_detail' idea.id %}" class="btn btn-sm btn-primary">View</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
