@@ -4,7 +4,9 @@ from django.http import JsonResponse
 from .models import Idea, Link
 from .forms import IdeaForm, LinkInlineFormSet, IdeaCreateForm
 import json
-import logging
+from django.db.models import F
+
+
 
 def dashboard(request):
     ideas = Idea.objects.all().order_by('order')
@@ -17,7 +19,9 @@ def create(request):
     if request.method == 'POST':
         form = IdeaCreateForm(request.POST)
         if form.is_valid():
-            idea = form.save()
+            idea = form.save(commit=False)
+            idea.order = Idea.objects.count()  # Assign the next available order
+            idea.save()
             return redirect('idea_detail', idea_id=idea.id)
         else:
             print(form.errors)
@@ -88,6 +92,12 @@ def update_idea_order(request):
 
         idea.order = new_index
         idea.save()
+
+        # Normalize the order values
+        ideas = Idea.objects.all().order_by('order')
+        for index, idea in enumerate(ideas):
+            idea.order = index
+            idea.save()
 
         return JsonResponse({'status': 'success'})
     except Exception as e:
