@@ -7,6 +7,7 @@
             <tr>
                 <th class="text-lg font-semibold">Idea</th>
                 <th class="text-lg font-semibold">Description</th>
+                <th class="text-lg font-semibold">Labels</th>
                 <th class="text-lg font-semibold">Actions</th>
             </tr>
         </thead>
@@ -15,6 +16,11 @@
             <tr data-id="{{ idea.id }}" class="hover:bg-gray-700 transition-colors duration-150 ease-in-out cursor-move border-b border-gray-600">
                 <td>{{ idea.name }}</td>
                 <td>{{ idea.description|truncatewords:20 }}</td>
+                <td>
+                    {% for label in idea.labels.all %}
+                        <span class="badge badge-outline">{{ label.name }}</span>
+                    {% endfor %}
+                </td>
                 <td class="space-y-2">
                     <a href="{% url 'idea_detail' idea.id %}" class="btn btn-sm btn-primary w-full">View</a>
                     <button class="btn btn-sm btn-error delete-btn w-full" data-id="{{ idea.id }}">Delete</button>

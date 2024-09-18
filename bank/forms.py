@@ -1,10 +1,15 @@
 from django import forms
-from .models import Idea, Link
+from .models import Idea, Link, Label
 
-class LinkInlineFormSet(forms.inlineformset_factory(Idea, Link, fields=['url'], extra=1, can_delete=True)):
-    pass
+class LabelForm(forms.ModelForm):
+    class Meta:
+        model = Label
+        fields = ['name']
+
 
 class IdeaForm(forms.ModelForm):
+    labels = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Enter labels separated by commas'}))
+
     class Meta:
         model = Idea
         fields = ["name", "description", "notes"]
@@ -12,6 +17,22 @@ class IdeaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['notes'].required = False
+        if self.instance.pk:
+            self.fields['labels'].initial = ', '.join([label.name for label in self.instance.labels.all()])
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            labels = [label.strip() for label in self.cleaned_data['labels'].split(',') if label.strip()]
+            instance.labels.clear()
+            for label_name in labels:
+                label, _ = Label.objects.get_or_create(name=label_name)
+                instance.labels.add(label)
+        return instance
+
+class LinkInlineFormSet(forms.inlineformset_factory(Idea, Link, fields=['url'], extra=1, can_delete=True)):
+    pass
 
 class IdeaCreateForm(forms.ModelForm):
     class Meta:

@@ -37,6 +37,10 @@
                 </ul>
                 <button type="button" id="add-link" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Add Link</button>
             </div>
+            <div id="labels-section">
+                <h2 class="text-xl font-semibold mb-4 text-white">Labels</h2>
+                <input type="text" name="{{ form.labels.name }}" id="{{ form.labels.id_for_label }}" value="{{ form.labels.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter labels separated by commas">
+            </div>
         </div>
 
         <div class="mb-8">
@@ -88,6 +92,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             `<li><a href="${input.value}" target="_blank" class="text-blue-400 hover:underline">${input.value}</a></li>`
                         ).join('')}
                     </ul>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold mb-4 text-white">Labels</h2>
+                    <p class="text-white">${document.getElementById('{{ form.labels.id_for_label }}').value.split(',').map(label => label.trim()).join(', ')}</p>
                 </div>
             </div>
             
