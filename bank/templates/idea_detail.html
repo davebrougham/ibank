@@ -23,25 +23,6 @@
         </div>
 
         <div class="grid grid-cols-2 gap-8 mb-8">
-            <div>
-                <h3 class="text-xl font-semibold mb-4 text-white">{{ idea.get_category_display | default:'Category' }}</h3>
-                <div class="mb-4">
-                    <label for="{{ form.complexity.id_for_label }}" class="block text-sm font-medium text-white mb-2">Complexity</label>
-                    <input type="text" name="{{ form.complexity.name }}" id="{{ form.complexity.id_for_label }}" value="{{ form.complexity.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="mb-4">
-                    <label for="{{ form.effort.id_for_label }}" class="block text-sm font-medium text-white mb-2">Effort</label>
-                    <input type="text" name="{{ form.effort.name }}" id="{{ form.effort.id_for_label }}" value="{{ form.effort.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="mb-4">
-                    <label for="{{ form.upside.id_for_label }}" class="block text-sm font-medium text-white mb-2">Upside</label>
-                    <input type="text" name="{{ form.upside.name }}" id="{{ form.upside.id_for_label }}" value="{{ form.upside.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="mb-4">
-                    <label for="{{ form.downside.id_for_label }}" class="block text-sm font-medium text-white mb-2">Downside</label>
-                    <input type="text" name="{{ form.downside.name }}" id="{{ form.downside.id_for_label }}" value="{{ form.downside.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-            </div>
             <div id="links-section">
                 <h2 class="text-xl font-semibold mb-4 text-white">Useful Links</h2>
                 {{ link_formset.management_form }}
@@ -100,13 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <p class="text-white mb-8">${document.getElementById('{{ form.description.id_for_label }}').value}</p>
             
             <div class="grid grid-cols-2 gap-8 mb-8">
-                <div>
-                    <h3 class="text-xl font-semibold mb-4 text-white">{{ idea.get_category_display | default:'Category' }}</h3>
-                    <p class="text-white mb-2">Complexity: ${document.getElementById('{{ form.complexity.id_for_label }}').value}</p>
-                    <p class="text-white mb-2">Effort: ${document.getElementById('{{ form.effort.id_for_label }}').value}</p>
-                    <p class="text-white mb-2">Upside: ${document.getElementById('{{ form.upside.id_for_label }}').value}</p>
-                    <p class="text-white mb-2">Downside: ${document.getElementById('{{ form.downside.id_for_label }}').value}</p>
-                </div>
                 <div>
                     <h2 class="text-xl font-semibold mb-4 text-white">Useful Links</h2>
                     <ul class="space-y-2">

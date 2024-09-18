@@ -7,11 +7,6 @@
             <tr>
                 <th class="text-lg font-semibold">Idea</th>
                 <th class="text-lg font-semibold">Description</th>
-                <th class="text-lg font-semibold">Complexity</th>
-                <th class="text-lg font-semibold">Effort</th>
-                <th class="text-lg font-semibold">Upside</th>
-                <th class="text-lg font-semibold">Downside</th>
-                <th class="text-lg font-semibold">Category</th>
                 <th class="text-lg font-semibold">Actions</th>
             </tr>
         </thead>
@@ -20,11 +15,6 @@
             <tr data-id="{{ idea.id }}" class="hover:bg-gray-700 transition-colors duration-150 ease-in-out cursor-move border-b border-gray-600">
                 <td>{{ idea.name }}</td>
                 <td>{{ idea.description|truncatewords:20 }}</td>
-                <td>{{ idea.complexity }}</td>
-                <td>{{ idea.effort }}</td>
-                <td>{{ idea.upside }}</td>
-                <td>{{ idea.downside }}</td>
-                <td>{{ idea.get_category_display }}</td>
                 <td class="space-y-2">
                     <a href="{% url 'idea_detail' idea.id %}" class="btn btn-sm btn-primary w-full">View</a>
                     <button class="btn btn-sm btn-error delete-btn w-full" data-id="{{ idea.id }}">Delete</button>
@@ -42,7 +32,6 @@
         const table = document.querySelector('table');
         const sortableList = document.getElementById('sortable-ideas');
     
-        // Initialize Sortable
         new Sortable(sortableList, {
             animation: 150,
             onEnd: function (evt) {

@@ -6,8 +6,6 @@ from .forms import IdeaForm, LinkInlineFormSet, IdeaCreateForm
 import json
 from django.db.models import F
 
-
-
 def dashboard(request):
     ideas = Idea.objects.all().order_by('order')
     context = {
@@ -20,7 +18,7 @@ def create(request):
         form = IdeaCreateForm(request.POST)
         if form.is_valid():
             idea = form.save(commit=False)
-            idea.order = Idea.objects.count()  # Assign the next available order
+            idea.order = Idea.objects.count()
             idea.save()
             return redirect('idea_detail', idea_id=idea.id)
         else:
@@ -36,9 +34,8 @@ def update_idea(request, idea_id):
         
         for field, value in data.items():
             setattr(idea, field, value)
-        
-        category_changed = idea.save()
-        return JsonResponse({'status': 'success', 'category_changed': category_changed})
+        idea.save()
+        return JsonResponse({'status': 'success'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
 
@@ -93,7 +90,6 @@ def update_idea_order(request):
         idea.order = new_index
         idea.save()
 
-        # Normalize the order values
         ideas = Idea.objects.all().order_by('order')
         for index, idea in enumerate(ideas):
             idea.order = index

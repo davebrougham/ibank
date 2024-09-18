@@ -9,5 +9,4 @@ urlpatterns = [
     path('delete-idea/<int:idea_id>/', views.delete_idea, name='delete_idea'),
     path('idea/<int:idea_id>/', views.idea_detail, name='idea_detail'),
     path('update-idea-order/', views.update_idea_order, name='update_idea_order'),
-    path('grouped-categories/', views.grouped_categories, name='grouped_categories'),
 ]
