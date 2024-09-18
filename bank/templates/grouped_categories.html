@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Grouped Categories - Idea Bank{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8 text-center">Grouped Categories</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {% for category, ideas in grouped_ideas.items %}
+            <div class="card bg-base-200 shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title text-2xl mb-4">{{ category_choices|get_item:category }} ({{ category_counts|get_item:category }})</h2>
+                    <ul class="space-y-2">
+                        {% for idea in ideas %}
+                            <li class="bg-base-300 p-4 rounded-lg">
+                                <a href="{% url 'idea_detail' idea.id %}" class="text-lg font-semibold hover:text-primary">{{ idea.name }}</a>
+                                <p class="text-sm mt-1">{{ idea.description|truncatewords:20 }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center col-span-2">No ideas with categories found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
