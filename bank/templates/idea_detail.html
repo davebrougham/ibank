@@ -4,9 +4,9 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto p-4 font-sans">
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-white">{{ idea.name }}</h1>
-        <button id="edit-button" class="btn btn-primary">Edit</button>
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+        <h1 class="text-3xl font-bold text-white mb-4 sm:mb-0">{{ idea.name }}</h1>
+        <button id="edit-button" class="btn btn-primary w-full sm:w-auto">Edit</button>
     </div>
     
     <form id="idea-form" method="post" class="mb-8 hidden">
@@ -22,7 +22,7 @@
             <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" rows="3" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.description.value|default:'' }}</textarea>
         </div>
 
-        <div class="grid grid-cols-2 gap-8 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div id="links-section">
                 <h2 class="text-xl font-semibold mb-4 text-white">Useful Links</h2>
                 {{ link_formset.management_form }}
@@ -39,7 +39,16 @@
             </div>
             <div id="labels-section">
                 <h2 class="text-xl font-semibold mb-4 text-white">Labels</h2>
-                <input type="text" name="{{ form.labels.name }}" id="{{ form.labels.id_for_label }}" value="{{ form.labels.value|default:'' }}" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter labels separated by commas">
+                <input type="hidden" name="labels" id="labels-input">
+                <ul class="space-y-2" id="labels-list">
+                    {% for label in idea.labels.all %}
+                        <li class="flex items-center justify-between">
+                            <input type="text" value="{{ label.name }}" class="flex-grow px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2 label-input">
+                            <button type="button" class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 delete-label">Delete</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <button type="button" id="add-label" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Add Label</button>
             </div>
         </div>
 
@@ -48,7 +57,7 @@
             <textarea name="{{ form.notes.name }}" id="{{ form.notes.id_for_label }}" rows="4" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.notes.value|default:'' }}</textarea>
         </div>
 
-        <div class="flex justify-end space-x-2">
+        <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Save Changes</button>
             <button type="button" id="discard-button" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">Discard Changes</button>
         </div>
@@ -72,11 +81,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const linksSection = document.getElementById('links-section');
     const addLinkButton = document.getElementById('add-link');
     const linksList = document.getElementById('links-list');
+    const labelsList = document.getElementById('labels-list');
+    const addLabelButton = document.getElementById('add-label');
+    const labelsInput = document.getElementById('labels-input');
 
     function toggleEditMode() {
         ideaForm.classList.toggle('hidden');
         ideaView.classList.toggle('hidden');
-        editButton.textContent = ideaForm.classList.contains('hidden') ? 'Edit' : 'Cancel';
+        editButton.textContent = ideaForm.classList.contains('hidden') ? 'Edit' : 'View';
     }
 
     function updateViewMode() {
@@ -84,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <h2 class="text-2xl font-semibold mb-4 text-white">Description</h2>
             <p class="text-white mb-8">${document.getElementById('{{ form.description.id_for_label }}').value}</p>
             
-            <div class="grid grid-cols-2 gap-8 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div>
                     <h2 class="text-xl font-semibold mb-4 text-white">Useful Links</h2>
                     <ul class="space-y-2">
@@ -95,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div>
                     <h2 class="text-xl font-semibold mb-4 text-white">Labels</h2>
-                    <p class="text-white">${document.getElementById('{{ form.labels.id_for_label }}').value.split(',').map(label => label.trim()).join(', ')}</p>
+                    <div class="space-x-2">${Array.from(labelsList.querySelectorAll('.label-input')).map(input => `<span class="badge badge-outline">${input.value}</span>`).join(' ')}</div>
                 </div>
             </div>
             
@@ -142,6 +154,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         document.querySelector('#id_links-TOTAL_FORMS').value = linkItems.length;
     }
+
+    function updateLabelsInput() {
+        const labelInputs = labelsList.querySelectorAll('.label-input');
+        const labelValues = Array.from(labelInputs).map(input => input.value.trim()).filter(Boolean);
+        labelsInput.value = labelValues.join(',');
+    }
+
+    addLabelButton.addEventListener('click', function() {
+        const newLabelItem = document.createElement('li');
+        newLabelItem.className = 'flex items-center justify-between';
+        newLabelItem.innerHTML = `
+            <input type="text" class="flex-grow px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2 label-input">
+            <button type="button" class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 delete-label">Delete</button>
+        `;
+        labelsList.appendChild(newLabelItem);
+        updateLabelsInput();
+    });
+
+    labelsList.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-label')) {
+            e.target.closest('li').remove();
+            updateLabelsInput();
+        }
+    });
+
+    labelsList.addEventListener('input', function(e) {
+        if (e.target.classList.contains('label-input')) {
+            updateLabelsInput();
+        }
+    });
+
+    // Call updateLabelsInput initially to set the initial value
+    updateLabelsInput();
 
     // Initialize view mode
     updateViewMode();

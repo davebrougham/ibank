@@ -11,12 +11,23 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="font-sans">
-    <div class="container mx-auto p-4">
-        <header class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold">Idea Bank</h1>
-            <nav>
-                <a href="{% url 'dashboard' %}" class="btn btn-secondary mr-2">Dashboard</a>
-                <a href="{% url 'create' %}" class="btn btn-secondary mr-2">Create</a>
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <header class="py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold">Idea Bank</h1>
+                <button id="mobile-menu-button" class="sm:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+                <nav class="hidden sm:block">
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary mr-2">Dashboard</a>
+                    <a href="{% url 'create' %}" class="btn btn-secondary">Create</a>
+                </nav>
+            </div>
+            <nav id="mobile-menu" class="hidden mt-4 sm:hidden">
+                <a href="{% url 'dashboard' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Dashboard</a>
+                <a href="{% url 'create' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Create</a>
             </nav>
         </header>
         <main>
@@ -30,6 +41,17 @@
             {% endblock %}
         </footer>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        });
+    </script>
 
     {% block extra_body %}{% endblock %}
 </body>

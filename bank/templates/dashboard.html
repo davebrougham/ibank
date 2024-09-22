@@ -6,8 +6,8 @@
         <thead>
             <tr>
                 <th class="text-lg font-semibold">Idea</th>
-                <th class="text-lg font-semibold">Description</th>
-                <th class="text-lg font-semibold">Labels</th>
+                <th class="text-lg font-semibold hidden sm:table-cell">Description</th>
+                <th class="text-lg font-semibold hidden xl:table-cell">Labels</th>
                 <th class="text-lg font-semibold">Actions</th>
             </tr>
         </thead>
@@ -15,8 +15,8 @@
             {% for idea in ideas %}
             <tr data-id="{{ idea.id }}" class="hover:bg-gray-700 transition-colors duration-150 ease-in-out cursor-move border-b border-gray-600">
                 <td>{{ idea.name }}</td>
-                <td>{{ idea.description|truncatewords:20 }}</td>
-                <td>
+                <td class="hidden sm:table-cell">{{ idea.description|truncatewords:20 }}</td>
+                <td class="hidden xl:table-cell">
                     {% for label in idea.labels.all %}
                         <span class="badge badge-outline">{{ label.name }}</span>
                     {% endfor %}
