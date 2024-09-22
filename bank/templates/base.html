@@ -14,7 +14,9 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <header class="py-4">
             <div class="flex justify-between items-center">
-                <h1 class="text-3xl font-bold">Idea Bank</h1>
+                <a href="{% url 'dashboard' %}" class="text-3xl font-bold hover:text-gray-300 transition-colors duration-200">
+                    <h1>Idea Bank</h1>
+                </a>
                 <button id="mobile-menu-button" class="sm:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>

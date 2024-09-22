@@ -1,7 +1,7 @@
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import Idea
+from .models import Idea, Label
 from .forms import IdeaForm, LinkInlineFormSet, IdeaCreateForm
 import json
 from django.db.models import F
@@ -98,3 +98,12 @@ def update_idea_order(request):
         return JsonResponse({'status': 'success'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
+
+def label_ideas(request, label_name):
+    label = get_object_or_404(Label, name=label_name)
+    ideas = Idea.objects.filter(labels=label).order_by('order')
+    context = {
+        "ideas": ideas,
+        "label": label,
+    }
+    return render(request, "label.html", context)

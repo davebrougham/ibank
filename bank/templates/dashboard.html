@@ -18,7 +18,7 @@
                 <td class="hidden sm:table-cell">{{ idea.description|truncatewords:20 }}</td>
                 <td class="hidden xl:table-cell">
                     {% for label in idea.labels.all %}
-                        <span class="badge badge-outline">{{ label.name }}</span>
+                        <a href="{% url 'label_ideas' label.name %}" class="badge badge-outline">{{ label.name }}</a>
                     {% endfor %}
                 </td>
                 <td class="space-y-2">

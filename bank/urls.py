@@ -9,4 +9,5 @@ urlpatterns = [
     path('delete-idea/<int:idea_id>/', views.delete_idea, name='delete_idea'),
     path('idea/<int:idea_id>/', views.idea_detail, name='idea_detail'),
     path('update-idea-order/', views.update_idea_order, name='update_idea_order'),
+    path('label/<str:label_name>/', views.label_ideas, name='label_ideas'),  # Add this new URL pattern
 ]
