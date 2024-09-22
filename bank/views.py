@@ -19,23 +19,23 @@ def create(request):
         if form.is_valid():
             idea = form.save(commit=False)
             idea.order = Idea.objects.count()
+            idea.name = form.cleaned_data['name']
+            idea.description = form.cleaned_data['description']
             idea.save()
             return redirect('idea_detail', idea_id=idea.id)
-        else:
-            print(form.errors)
     else:
         form = IdeaCreateForm()
     return render(request, 'create.html', {'form': form})
 
 def update_idea(request, idea_id):
     try:
-        idea = Idea.objects.get(id=idea_id)
-        data = json.loads(request.body)
-        
-        for field, value in data.items():
-            setattr(idea, field, value)
-        idea.save()
-        return JsonResponse({'status': 'success'})
+        idea = get_object_or_404(Idea, id=idea_id)
+        form = IdeaForm(request.POST, instance=idea)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'error', 'message': form.errors})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
 
