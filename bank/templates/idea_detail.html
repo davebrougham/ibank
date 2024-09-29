@@ -3,7 +3,18 @@
 {% block content %}
 <div class="max-w-4xl mx-auto p-4 font-sans">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-        <h1 class="text-3xl font-bold text-white mb-4 sm:mb-0">{{ idea.name }}</h1>
+        <div class="flex items-center w-full sm:w-auto mb-4 sm:mb-0">
+            <h1 id="idea-name" class="text-3xl font-bold text-white mr-4">{{ idea.name }}</h1>
+            {% if is_pro %}
+                <button id="generate-name-btn" class="btn btn-accent btn-sm" data-idea-id="{{ idea.id }}">
+                    Generate Brand Name
+                </button>
+            {% else %}
+                <button class="btn btn-accent btn-sm" onclick="alert('Upgrade to Pro to use this feature!')">
+                    Generate Brand Name With Pro
+                </button>
+            {% endif %}
+        </div>
         <button id="edit-button" class="btn btn-primary w-full sm:w-auto">Edit</button>
     </div>
     
@@ -61,7 +72,33 @@
         </div>
     </form>
     
+    
     <div id="idea-view" class="mb-8">
+    </div>
+    
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-semibold text-white">Business Plan</h2>
+            {% if is_pro %}
+                <button id="generate-plan-btn" class="btn btn-accent" data-idea-id="{{ idea.id }}">
+                    Generate AI Powered Business Plan
+                </button>
+            {% else %}
+                <button class="btn btn-accent" onclick="alert('Upgrade to Pro to use this feature!')">
+                    Generate Business Plan With Pro
+                </button>
+            {% endif %}
+        </div>
+
+        <div id="business-plan" class="{% if idea.plan %} {% else %} bg-gray-700 border-gray-700 border rounded-md p-4 {% endif %}">
+            {% if idea.plan %}
+                <p class="text-white">{{ idea.plan }}</p>
+            {% elif is_pro %}
+                <p class="text-white">Your AI-generated business plan will appear here.</p>
+            {% else %}
+                <p class="text-white">Upgrade to Pro to access AI-generated business plans for your ideas!</p>
+            {% endif %}
+        </div>
     </div>
     
     <div class="text-gray-300 mt-8">
@@ -114,9 +151,17 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             
             <h2 class="text-2xl font-semibold mb-4 text-white">Notes</h2>
-            <p class="text-white">${document.getElementById('{{ form.notes.id_for_label }}').value}</p>
+            <p class="text-white mb-8">${document.getElementById('{{ form.notes.id_for_label }}').value}</p>
         `;
         ideaView.innerHTML = viewHTML;
+
+        const businessPlanDiv = document.getElementById('business-plan');
+        const businessPlanContent = businessPlanDiv.querySelector('p').textContent;
+        if (businessPlanContent && businessPlanContent !== "Your AI-generated business plan will appear here." && businessPlanContent !== "Upgrade to Pro to access AI-generated business plans for your ideas!") {
+            businessPlanDiv.classList.remove('bg-gray-700', 'border-gray-700', 'border', 'rounded-md', 'p-4');
+        } else {
+            businessPlanDiv.classList.add('bg-gray-700', 'border-gray-700', 'border', 'rounded-md', 'p-4');
+        }
     }
 
     editButton.addEventListener('click', toggleEditMode);
@@ -192,6 +237,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize view mode
     updateViewMode();
+
+    document.getElementById('generate-name-btn')?.addEventListener('click', function() {
+        const ideaId = this.dataset.ideaId;
+        fetch(`/generate-name/${ideaId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('idea-name').textContent = data.new_name;
+            } else {
+                console.error('Failed to generate name');
+            }
+        });
+    });
+
+    document.getElementById('generate-plan-btn')?.addEventListener('click', function() {
+        const ideaId = this.dataset.ideaId;
+        fetch(`/generate-plan/${ideaId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const businessPlanDiv = document.getElementById('business-plan');
+                businessPlanDiv.innerHTML = `<p class="text-white">${data.business_plan}</p>`;
+                // Remove styling classes when plan is generated
+                businessPlanDiv.classList.remove('bg-gray-700', 'border-gray-700', 'border', 'rounded-md', 'p-4');
+            } else {
+                console.error('Failed to generate business plan');
+            }
+        });
+    });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 });
 </script>
 {% endblock %}

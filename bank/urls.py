@@ -14,4 +14,6 @@ urlpatterns = [
     path('register/', auth_views.register_view, name='register'),
     path('login/', auth_views.login_view, name='login'),
     path('logout/', auth_views.logout_view, name='logout'),
+    path('generate-name/<int:idea_id>/', views.generate_name, name='generate_name'),
+    path('generate-plan/<int:idea_id>/', views.generate_plan, name='generate_plan'),
 ]

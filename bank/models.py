@@ -39,7 +39,8 @@ class Idea(models.Model):
     order = models.IntegerField(default=0)
     labels = models.ManyToManyField('Label', related_name='ideas', blank=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='ideas', default=1)
-
+    plan = models.TextField(blank=True, null=True)
+    
     class Meta:
         db_table = 'idea'
         ordering = ['order']

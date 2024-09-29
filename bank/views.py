@@ -55,6 +55,7 @@ def delete_idea(request, idea_id):
 @login_required
 def idea_detail(request, idea_id):
     idea = get_object_or_404(Idea, id=idea_id)
+    is_pro = request.user.is_pro
     if request.method == 'POST':
         form = IdeaForm(request.POST, instance=idea)
         link_formset = LinkInlineFormSet(request.POST, instance=idea)
@@ -70,6 +71,7 @@ def idea_detail(request, idea_id):
         'idea': idea,
         'form': form,
         'link_formset': link_formset,
+        'is_pro': is_pro,
     })
 
 @require_POST
@@ -113,3 +115,18 @@ def label_ideas(request, label_name):
         "label": label,
     }
     return render(request, "label.html", context)
+
+@login_required
+def generate_name(request, idea_id):
+    idea = get_object_or_404(Idea, id=idea_id, user=request.user)
+    idea.name = f"{idea.name} [AI]"
+    idea.save()
+    return JsonResponse({'status': 'success', 'new_name': idea.name})
+
+@login_required
+def generate_plan(request, idea_id):
+    idea = get_object_or_404(Idea, id=idea_id, user=request.user)
+    business_plan = "AI Generated Business Plan [AI]"
+    idea.plan = business_plan
+    idea.save()
+    return JsonResponse({'status': 'success', 'business_plan': business_plan})
