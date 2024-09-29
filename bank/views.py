@@ -5,14 +5,17 @@ from .models import Idea, Label
 from .forms import IdeaForm, LinkInlineFormSet, IdeaCreateForm
 import json
 from django.db.models import F
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def dashboard(request):
-    ideas = Idea.objects.all().order_by('order')
+    ideas = Idea.objects.filter(user=request.user).order_by('order')
     context = {
         "ideas": ideas,
     }
     return render(request, "dashboard.html", context)
 
+@login_required
 def create(request):
     if request.method == 'POST':
         form = IdeaCreateForm(request.POST)
@@ -21,12 +24,14 @@ def create(request):
             idea.order = Idea.objects.count()
             idea.name = form.cleaned_data['name']
             idea.description = form.cleaned_data['description']
+            idea.user = request.user
             idea.save()
             return redirect('idea_detail', idea_id=idea.id)
     else:
         form = IdeaCreateForm()
     return render(request, 'create.html', {'form': form})
 
+@login_required
 def update_idea(request, idea_id):
     try:
         idea = get_object_or_404(Idea, id=idea_id)
@@ -47,6 +52,7 @@ def delete_idea(request, idea_id):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
 
+@login_required
 def idea_detail(request, idea_id):
     idea = get_object_or_404(Idea, id=idea_id)
     if request.method == 'POST':

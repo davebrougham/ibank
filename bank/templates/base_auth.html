@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="business">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data:;
+    connect-src 'self';
+    frame-src 'self';
+    base-uri 'self';
+    form-action 'self';">
+    <title>{% block title %}Idea Bank{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.0/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="font-sans bg-gray-900 text-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <header class="py-4">
+            <div class="flex justify-center items-center">
+                <h1 class="text-3xl font-bold">Idea Bank</h1>
+            </div>
+        </header>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="py-4 text-center text-gray-500">
+            <p>&copy; 2024 Idea Bank. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

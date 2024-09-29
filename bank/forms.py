@@ -1,5 +1,6 @@
 from django import forms
-from .models import Idea, Link, Label
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .models import Idea, Link, Label, CustomUser
 
 class LabelForm(forms.ModelForm):
     class Meta:
@@ -40,3 +41,20 @@ class IdeaCreateForm(forms.ModelForm):
     class Meta:
         model = Idea
         fields = ["name", "description"]
+
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ("email", "password1", "password2")
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data["email"]
+        if commit:
+            user.save()
+        return user
+
+class CustomAuthenticationForm(AuthenticationForm):
+    username = forms.EmailField(label='Email')
