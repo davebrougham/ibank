@@ -39,7 +39,7 @@ class Idea(models.Model):
     order = models.IntegerField(default=0)
     labels = models.ManyToManyField('Label', related_name='ideas', blank=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='ideas', default=1)
-    plan = models.TextField(blank=True, null=True)
+    plan = models.JSONField(blank=True, null=True)
     
     class Meta:
         db_table = 'idea'
@@ -68,3 +68,13 @@ class Label(models.Model):
     def __str__(self):
         return self.name
 
+
+class ClaudeResponse(models.Model):
+    prompt = models.TextField()
+    response = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name='claude_responses')
+
+    def __str__(self):
+        return f"Response to: {self.prompt[:50]}..."
+    

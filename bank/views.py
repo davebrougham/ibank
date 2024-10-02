@@ -6,6 +6,9 @@ from .forms import IdeaForm, LinkInlineFormSet, IdeaCreateForm
 import json
 from django.db.models import F
 from django.contrib.auth.decorators import login_required
+from .services import ClaudeService
+from .models import ClaudeResponse
+import logging 
 
 @login_required
 def dashboard(request):
@@ -54,8 +57,9 @@ def delete_idea(request, idea_id):
 
 @login_required
 def idea_detail(request, idea_id):
-    idea = get_object_or_404(Idea, id=idea_id)
+    idea = get_object_or_404(Idea, id=idea_id, user=request.user)
     is_pro = request.user.is_pro
+    
     if request.method == 'POST':
         form = IdeaForm(request.POST, instance=idea)
         link_formset = LinkInlineFormSet(request.POST, instance=idea)
@@ -66,13 +70,36 @@ def idea_detail(request, idea_id):
     else:
         form = IdeaForm(instance=idea)
         link_formset = LinkInlineFormSet(instance=idea)
+
+    # Structure the business plan data
+    business_plan_sections = []
+    if idea.plan:
+        for section in [
+            "Executive Summary",
+            "Business Description",
+            "Brand Identity",
+            "Market Analysis",
+            "Product Development",
+            "Technology Stack",
+            "Content Strategy",
+            "Marketing Strategy",
+            "Next Steps"
+        ]:
+            if section in idea.plan:
+                business_plan_sections.append({
+                    'title': section,
+                    'content': idea.plan[section]
+                })
     
-    return render(request, 'idea_detail.html', {
+    context = {
         'idea': idea,
         'form': form,
         'link_formset': link_formset,
         'is_pro': is_pro,
-    })
+        'business_plan_sections': business_plan_sections,
+    }
+    
+    return render(request, 'idea_detail.html', context)
 
 @require_POST
 def update_idea_order(request):
@@ -126,7 +153,86 @@ def generate_name(request, idea_id):
 @login_required
 def generate_plan(request, idea_id):
     idea = get_object_or_404(Idea, id=idea_id, user=request.user)
-    business_plan = "AI Generated Business Plan [AI]"
-    idea.plan = business_plan
-    idea.save()
-    return JsonResponse({'status': 'success', 'business_plan': business_plan})
+    
+    prompt = STRUCTURED_PROMPT.format(idea.description)
+    claude_service = ClaudeService()
+    structured_response = claude_service.get_structured_response(prompt)
+
+    if structured_response:
+        try:
+            # Check if the response is already a dictionary
+            if isinstance(structured_response, dict):
+                parsed_response = structured_response
+            else:
+                # If it's a string, try to parse it as JSON
+                parsed_response = json.loads(structured_response)
+            
+            # If it's still a string (double-encoded JSON), parse it again
+            if isinstance(parsed_response, str):
+                parsed_response = json.loads(parsed_response)
+        except json.JSONDecodeError as e:
+            logging.error(f"JSON Decode Error: {e}")
+            return JsonResponse({"error": "Failed to parse response"}, status=500)
+        except Exception as e:
+            logging.error(f"Error parsing response: {e}")
+            return JsonResponse({"error": "An unexpected error occurred"}, status=500)
+
+        claude_response = ClaudeResponse.objects.create(
+            prompt=prompt,
+            response=json.dumps(parsed_response),  # Store as a JSON string
+            idea=idea
+        )
+        
+        idea.plan = parsed_response  # Store the parsed response as a JSON object
+        idea.save()
+        return JsonResponse({'status': 'success', 'business_plan': parsed_response})
+    else:
+        # Handle the error case
+        return JsonResponse({"error": "Failed to generate plan"}, status=500)
+
+# @csrf_exempt
+# @require_http_methods(["POST"])
+# def get_claude_response(request):
+    # # prompt = request.POST.get('prompt')
+    # # if not prompt:
+    # #     return JsonResponse({"error": "Prompt is required"}, status=400)
+
+    # claude_service = ClaudeService()
+    # structured_response = claude_service.get_structured_response(prompt)
+
+    # if structured_response:
+    #     claude_response = ClaudeResponse.objects.create(
+    #         prompt=prompt,
+    #         response=str(structured_response)
+    #     )
+    #     return JsonResponse({"id": claude_response.id, "response": structured_response})
+    # else:
+    #     return JsonResponse({"error": "Failed to get response from Claude"}, status=500)
+    
+    
+STRUCTURED_PROMPT = '''
+{}
+
+Please create a comprehensive business plan for this idea, structured as follows:
+
+Business Description
+Brand Identity
+Content Strategy
+Marketing Strategy
+Next Steps
+
+- For each of these 5 sections, present the content in the format of a Python dictionary, with Section Name as the key and Section Content as the value. Ensure that each section provides relevant, detailed information about the business concept, considering aspects such as target audience, revenue model, potential challenges, and growth strategies. For the 'Next Steps' section, focus on immediate, actionable items to move the business forward. Focus on the next 3 steps.
+- Keep each section concise and to the point.
+- Do not include any other text in your response. Only include the Dictionary. Do not return a key for the dictionary.
+- Do not use we, I or any other personal pronouns. 
+
+Do not include `\`, new line, line breaks, or any other formatting.
+'''
+
+other_sections = '''
+Executive Summary
+Market Analysis
+Product Development
+Technology Stack
+
+'''

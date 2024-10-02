@@ -90,9 +90,14 @@
             {% endif %}
         </div>
 
-        <div id="business-plan" class="{% if idea.plan %} {% else %} bg-gray-700 border-gray-700 border rounded-md p-4 {% endif %}">
-            {% if idea.plan %}
-                <p class="text-white">{{ idea.plan }}</p>
+        <div id="business-plan" class="{% if not business_plan_sections %}bg-gray-700 border-gray-700 border rounded-md p-4{% endif %}">
+            {% if business_plan_sections %}
+                {% for section in business_plan_sections %}
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold text-white mb-2">{{ section.title }}</h3>
+                        <p class="text-gray-300 whitespace-pre-wrap">{{ section.content }}</p>
+                    </div>
+                {% endfor %}
             {% elif is_pro %}
                 <p class="text-white">Your AI-generated business plan will appear here.</p>
             {% else %}
@@ -268,9 +273,32 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.status === 'success') {
                 const businessPlanDiv = document.getElementById('business-plan');
-                businessPlanDiv.innerHTML = `<p class="text-white">${data.business_plan}</p>`;
-                // Remove styling classes when plan is generated
+                businessPlanDiv.innerHTML = '';
                 businessPlanDiv.classList.remove('bg-gray-700', 'border-gray-700', 'border', 'rounded-md', 'p-4');
+                
+                const sections = [
+                    "Executive Summary",
+                    "Business Description",
+                    "Brand Identity",
+                    "Market Analysis",
+                    "Product Development",
+                    "Technology Stack",
+                    "Content Strategy",
+                    "Marketing Strategy",
+                    "Next Steps"
+                ];
+                
+                sections.forEach(section => {
+                    if (data.business_plan[section]) {
+                        const sectionDiv = document.createElement('div');
+                        sectionDiv.className = 'mb-6';
+                        sectionDiv.innerHTML = `
+                            <h3 class="text-xl font-semibold text-white mb-2">${section}</h3>
+                            <p class="text-gray-300 whitespace-pre-wrap">${data.business_plan[section]}</p>
+                        `;
+                        businessPlanDiv.appendChild(sectionDiv);
+                    }
+                });
             } else {
                 console.error('Failed to generate business plan');
             }

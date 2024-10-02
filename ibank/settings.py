@@ -130,3 +130,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'bank.CustomUser'
 
 LOGIN_URL = '/login/'
+
+ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
