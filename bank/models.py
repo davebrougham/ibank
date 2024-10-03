@@ -40,6 +40,12 @@ class Idea(models.Model):
     labels = models.ManyToManyField('Label', related_name='ideas', blank=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='ideas', default=1)
     plan = models.JSONField(blank=True, null=True)
+    last_plan_generated_at = models.DateTimeField(null=True, blank=True)
+
+    def can_generate_plan(self):
+        if not self.last_plan_generated_at:
+            return True
+        return (timezone.now() - self.last_plan_generated_at).days >= 1
     
     class Meta:
         db_table = 'idea'
@@ -77,4 +83,3 @@ class ClaudeResponse(models.Model):
 
     def __str__(self):
         return f"Response to: {self.prompt[:50]}..."
-    

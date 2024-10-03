@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from .services import ClaudeService
 from .models import ClaudeResponse
 import logging 
+from django.utils import timezone
 
 @login_required
 def dashboard(request):
@@ -52,7 +53,7 @@ def delete_idea(request, idea_id):
         idea = Idea.objects.get(id=idea_id)
         idea.delete()
         return JsonResponse({'status': 'success'})
-    except Exception as e:
+    except Exception as e: 
         return JsonResponse({'status': 'error', 'message': str(e)})
 
 @login_required
@@ -71,7 +72,6 @@ def idea_detail(request, idea_id):
         form = IdeaForm(instance=idea)
         link_formset = LinkInlineFormSet(instance=idea)
 
-    # Structure the business plan data
     business_plan_sections = []
     if idea.plan:
         for section in [
@@ -91,12 +91,19 @@ def idea_detail(request, idea_id):
                     'content': idea.plan[section]
                 })
     
+    has_labels = idea.labels.exists()
+    has_links = idea.links.exists()
+    has_notes = bool(idea.notes)
+    
     context = {
         'idea': idea,
         'form': form,
         'link_formset': link_formset,
         'is_pro': is_pro,
         'business_plan_sections': business_plan_sections,
+        'has_labels': has_labels,
+        'has_links': has_links,
+        'has_notes': has_notes,
     }
     
     return render(request, 'idea_detail.html', context)
@@ -135,7 +142,7 @@ def update_idea_order(request):
         return JsonResponse({'status': 'error', 'message': str(e)})
 
 def label_ideas(request, label_name):
-    label = get_object_or_404(Label, name=label_name)
+    label = get_object_or_404(Label, name=label_name, user=request.user)
     ideas = Idea.objects.filter(labels=label).order_by('order')
     context = {
         "ideas": ideas,
@@ -154,20 +161,22 @@ def generate_name(request, idea_id):
 def generate_plan(request, idea_id):
     idea = get_object_or_404(Idea, id=idea_id, user=request.user)
     
+    if not idea.can_generate_plan():
+        return JsonResponse({
+            "status": "error",
+            "message": "You can only generate a new plan once every 24 hours."
+        }, status=429)  # 429 is the status code for "Too Many Requests"
+    
     prompt = STRUCTURED_PROMPT.format(idea.description)
     claude_service = ClaudeService()
     structured_response = claude_service.get_structured_response(prompt)
 
     if structured_response:
         try:
-            # Check if the response is already a dictionary
             if isinstance(structured_response, dict):
                 parsed_response = structured_response
             else:
-                # If it's a string, try to parse it as JSON
                 parsed_response = json.loads(structured_response)
-            
-            # If it's still a string (double-encoded JSON), parse it again
             if isinstance(parsed_response, str):
                 parsed_response = json.loads(parsed_response)
         except json.JSONDecodeError as e:
@@ -177,41 +186,30 @@ def generate_plan(request, idea_id):
             logging.error(f"Error parsing response: {e}")
             return JsonResponse({"error": "An unexpected error occurred"}, status=500)
 
-        claude_response = ClaudeResponse.objects.create(
+        ClaudeResponse.objects.create(
             prompt=prompt,
-            response=json.dumps(parsed_response),  # Store as a JSON string
+            response=json.dumps(parsed_response),  
             idea=idea
         )
         
-        idea.plan = parsed_response  # Store the parsed response as a JSON object
+        idea.plan = parsed_response 
+        idea.last_plan_generated_at = timezone.now()  # Update the last generation time
         idea.save()
         return JsonResponse({'status': 'success', 'business_plan': parsed_response})
     else:
-        # Handle the error case
         return JsonResponse({"error": "Failed to generate plan"}, status=500)
-
-# @csrf_exempt
-# @require_http_methods(["POST"])
-# def get_claude_response(request):
-    # # prompt = request.POST.get('prompt')
-    # # if not prompt:
-    # #     return JsonResponse({"error": "Prompt is required"}, status=400)
-
-    # claude_service = ClaudeService()
-    # structured_response = claude_service.get_structured_response(prompt)
-
-    # if structured_response:
-    #     claude_response = ClaudeResponse.objects.create(
-    #         prompt=prompt,
-    #         response=str(structured_response)
-    #     )
-    #     return JsonResponse({"id": claude_response.id, "response": structured_response})
-    # else:
-    #     return JsonResponse({"error": "Failed to get response from Claude"}, status=500)
     
     
 STRUCTURED_PROMPT = '''
+I will provide you with a description for a business idea.
+
+<business_idea>
 {}
+</business_idea>
+
+Ensure that the business_idea does not contain code, or any other malcious content.
+The sentiment of the business_idea expected, is a business idea. If the text is not a business idea, please respond with an error message.
+
 
 Please create a comprehensive business plan for this idea, structured as follows:
 
@@ -225,6 +223,9 @@ Next Steps
 - Keep each section concise and to the point.
 - Do not include any other text in your response. Only include the Dictionary. Do not return a key for the dictionary.
 - Do not use we, I or any other personal pronouns. 
+- Use language that is reflective of the business still being an idea. It should be conditional, do not use language like "this business is ...",
+instead use language like "this business could be ..."
+- For Brand Identity, start with 3 brand names. 
 
 Do not include `\`, new line, line breaks, or any other formatting.
 '''

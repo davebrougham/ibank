@@ -30,7 +30,7 @@ class IdeaForm(forms.ModelForm):
             for label_name in labels:
                 label_name = label_name.strip()
                 if label_name:
-                    label, _ = Label.objects.get_or_create(name=label_name)
+                    label, _ = Label.objects.get_or_create(name=label_name, user=instance.user)
                     instance.labels.add(label)
         return instance
 

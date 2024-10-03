@@ -5,15 +5,6 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <div class="flex items-center w-full sm:w-auto mb-4 sm:mb-0">
             <h1 id="idea-name" class="text-3xl font-bold text-white mr-4">{{ idea.name }}</h1>
-            {% if is_pro %}
-                <button id="generate-name-btn" class="btn btn-accent btn-sm" data-idea-id="{{ idea.id }}">
-                    Generate Brand Name
-                </button>
-            {% else %}
-                <button class="btn btn-accent btn-sm" onclick="alert('Upgrade to Pro to use this feature!')">
-                    Generate Brand Name With Pro
-                </button>
-            {% endif %}
         </div>
         <button id="edit-button" class="btn btn-primary w-full sm:w-auto">Edit</button>
     </div>
@@ -74,6 +65,36 @@
     
     
     <div id="idea-view" class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4 text-white">Description</h2>
+        <p class="text-white mb-8">{{ idea.description }}</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {% if has_links %}
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-white">Useful Links</h2>
+                <ul class="space-y-2">
+                    {% for link in idea.links.all %}
+                        <li><a href="{{ link.url }}" target="_blank" class="text-blue-400 hover:underline">{{ link.url }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% if has_labels %}
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-white">Labels</h2>
+                <div class="space-x-2">
+                    {% for label in idea.labels.all %}
+                        <a href="/label/{{ label.name|urlencode }}" class="badge badge-outline hover:bg-gray-700 transition-colors duration-200">{{ label.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if has_notes %}
+        <h2 class="text-2xl font-semibold mb-4 text-white">Notes</h2>
+        <p class="text-white mb-8">{{ idea.notes }}</p>
+        {% endif %}
     </div>
     
     <div class="mb-8">
@@ -83,6 +104,9 @@
                 <button id="generate-plan-btn" class="btn btn-accent" data-idea-id="{{ idea.id }}">
                     Generate AI Powered Business Plan
                 </button>
+                <div id="loading-animation" class="hidden">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                </div>
             {% else %}
                 <button class="btn btn-accent" onclick="alert('Upgrade to Pro to use this feature!')">
                     Generate Business Plan With Pro
@@ -124,6 +148,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const labelsList = document.getElementById('labels-list');
     const addLabelButton = document.getElementById('add-label');
     const labelsInput = document.getElementById('labels-input');
+    const generatePlanBtn = document.getElementById('generate-plan-btn');
+    const loadingAnimation = document.getElementById('loading-animation');
 
     function toggleEditMode() {
         ideaForm.classList.toggle('hidden');
@@ -137,26 +163,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <p class="text-white mb-8">${document.getElementById('{{ form.description.id_for_label }}').value}</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <div>
-                    <h2 class="text-xl font-semibold mb-4 text-white">Useful Links</h2>
-                    <ul class="space-y-2">
-                        ${Array.from(linksList.querySelectorAll('input[type="url"]')).map(input => 
-                            `<li><a href="${input.value}" target="_blank" class="text-blue-400 hover:underline">${input.value}</a></li>`
-                        ).join('')}
-                    </ul>
-                </div>
-                <div>
-                    <h2 class="text-xl font-semibold mb-4 text-white">Labels</h2>
-                    <div class="space-x-2">
-                        ${Array.from(labelsList.querySelectorAll('.label-input')).map(input => 
-                            `<a href="/label/${encodeURIComponent(input.value)}" class="badge badge-outline hover:bg-gray-700 transition-colors duration-200">${input.value}</a>`
-                        ).join(' ')}
-                    </div>
-                </div>
+                ${getLinksHTML()}
+                ${getLabelsHTML()}
             </div>
             
-            <h2 class="text-2xl font-semibold mb-4 text-white">Notes</h2>
-            <p class="text-white mb-8">${document.getElementById('{{ form.notes.id_for_label }}').value}</p>
+            ${getNotesHTML()}
         `;
         ideaView.innerHTML = viewHTML;
 
@@ -167,6 +178,41 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             businessPlanDiv.classList.add('bg-gray-700', 'border-gray-700', 'border', 'rounded-md', 'p-4');
         }
+    }
+
+    function getLinksHTML() {
+        const links = Array.from(linksList.querySelectorAll('input[type="url"]')).map(input => input.value).filter(Boolean);
+        if (links.length === 0) return '';
+        return `
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-white">Useful Links</h2>
+                <ul class="space-y-2">
+                    ${links.map(link => `<li><a href="${link}" target="_blank" class="text-blue-400 hover:underline">${link}</a></li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    function getLabelsHTML() {
+        const labels = Array.from(labelsList.querySelectorAll('.label-input')).map(input => input.value).filter(Boolean);
+        if (labels.length === 0) return '';
+        return `
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-white">Labels</h2>
+                <div class="space-x-2">
+                    ${labels.map(label => `<a href="/label/${encodeURIComponent(label)}" class="badge badge-outline hover:bg-gray-700 transition-colors duration-200">${label}</a>`).join(' ')}
+                </div>
+            </div>
+        `;
+    }
+
+    function getNotesHTML() {
+        const notes = document.getElementById('{{ form.notes.id_for_label }}').value.trim();
+        if (!notes) return '';
+        return `
+            <h2 class="text-2xl font-semibold mb-4 text-white">Notes</h2>
+            <p class="text-white mb-8">${notes}</p>
+        `;
     }
 
     editButton.addEventListener('click', toggleEditMode);
@@ -243,26 +289,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize view mode
     updateViewMode();
 
-    document.getElementById('generate-name-btn')?.addEventListener('click', function() {
+    generatePlanBtn?.addEventListener('click', function() {
         const ideaId = this.dataset.ideaId;
-        fetch(`/generate-name/${ideaId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                document.getElementById('idea-name').textContent = data.new_name;
-            } else {
-                console.error('Failed to generate name');
-            }
-        });
-    });
+        
+        // Hide the button and show the loading animation
+        generatePlanBtn.classList.add('hidden');
+        loadingAnimation.classList.remove('hidden');
 
-    document.getElementById('generate-plan-btn')?.addEventListener('click', function() {
-        const ideaId = this.dataset.ideaId;
         fetch(`/generate-plan/${ideaId}/`, {
             method: 'POST',
             headers: {
@@ -299,9 +332,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         businessPlanDiv.appendChild(sectionDiv);
                     }
                 });
-            } else {
-                console.error('Failed to generate business plan');
+            } else if (data.status === 'error') {
+                // Display the error message to the user
+                alert(data.message);
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            // Hide the loading animation and show the button again
+            generatePlanBtn.classList.remove('hidden');
+            loadingAnimation.classList.add('hidden');
         });
     });
 
