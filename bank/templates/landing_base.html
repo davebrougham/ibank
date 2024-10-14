@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" dir="ltr" class="h-full" data-theme="ideabank">
+    <head>
+        <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Idea Bank - Organize Your Business Ideas</title>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.0/dist/full.css" rel="stylesheet" type="text/css" />
+        <link href="{% static 'css/output.css' %}" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+    <body class="flex flex-col min-h-full font-sans bg-base-100 text-primary">
+        <nav class="bg-primary text-primary-content py-4">
+            <div class="container mx-auto px-4 flex justify-between items-center">
+                <a href="{% url 'landing_page' %}" class="text-4xl font-bold font-serif">IdeaBank</a>
+                <div>
+                    <a href="{% url 'login' %}" class="mr-4 hover:text-secondary transition duration-300">Login</a>
+                    <a href="{% url 'register' %}" class="btn bg-secondary text-secondary-content hover:bg-opacity-90 border-none rounded-md px-6 transition duration-300">Sign Up</a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="flex-grow">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+        <footer class="bg-primary text-primary-content py-6 m">
+            <div class="container mx-auto px-4 text-center">
+                <p>Hey 👋 I'm Dave, the indie maker of IdeaBank. You can follow my work
+                    <a href="https://www.x.com/davebroio" class="underline hover:text-secondary transition duration-300">here</a>
+                </p>
+            </div>
+        </footer>
+    </body>
+</html>

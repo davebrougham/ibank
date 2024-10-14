@@ -8,7 +8,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('dashboard')
+            return redirect('home')
     else:
         form = CustomUserCreationForm()
     return render(request, 'register.html', {'form': form})
@@ -22,11 +22,11 @@ def login_view(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('dashboard')
+                return redirect('home')
     else:
         form = CustomAuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('home')

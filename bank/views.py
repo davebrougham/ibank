@@ -10,6 +10,18 @@ from .services import ClaudeService
 from .models import ClaudeResponse
 import logging 
 from django.utils import timezone
+from django.contrib.auth import login, authenticate
+
+# Add this new view
+def home(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    return redirect('landing_page')
+
+def landing_page(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    return render(request, 'landing_page.html')
 
 @login_required
 def dashboard(request):
@@ -38,7 +50,7 @@ def create(request):
 @login_required
 def update_idea(request, idea_id):
     try:
-        idea = get_object_or_404(Idea, id=idea_id)
+        idea = get_object_or_404(Idea, id=idea_id, user=request.user)
         form = IdeaForm(request.POST, instance=idea)
         if form.is_valid():
             form.save()
@@ -48,9 +60,10 @@ def update_idea(request, idea_id):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
 
+@login_required
 def delete_idea(request, idea_id):
     try:
-        idea = Idea.objects.get(id=idea_id)
+        idea = get_object_or_404(Idea, id=idea_id, user=request.user)
         idea.delete()
         return JsonResponse({'status': 'success'})
     except Exception as e: 

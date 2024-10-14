@@ -1,0 +1,130 @@
+{% extends "landing_base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-primary text-primary-content">
+  <div class="container mx-auto px-4 py-8 md:py-16 text-center">
+    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">Cultivate Your Business Ideas</h1>
+    <p class="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto">
+      Idea Bank helps you capture, organize, and develop your business ideas with ease. Turn your inspiration into action.
+    </p>
+    <a href="{% url 'register' %}" class="btn btn-lg bg-secondary text-secondary-content hover:bg-opacity-90 border-none rounded-md px-4 sm:px-6 md:px-8 py-2 md:py-3 text-sm sm:text-base md:text-lg font-bold uppercase">
+      Start Organizing Now
+    </a>
+  </div>
+</div>
+
+<div class="bg-white py-8 md:py-16">
+  <div class="container mx-auto px-4 text-center">
+    <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-primary italic mb-6 md:mb-8">
+      "The best way to have a good idea is to have lots of ideas." - Linus Pauling
+    </p>
+    <div class="max-w-4xl mx-auto rounded-lg overflow-hidden shadow-2xl">
+      <img src="{% static 'images/idea_bank_demo.png' %}" alt="Idea Bank Demo" class="w-full">
+    </div>
+  </div>
+</div>
+
+<div class="bg-gray-100 py-8 md:py-16">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-primary">
+      Built for entrepreneurs and innovators
+    </h2>
+    <div class="flex flex-col items-start gap-4 max-w-md mx-auto text-primary">
+      <div class="flex items-center w-full">
+        <svg class="w-6 h-6 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+        </svg>
+        <span class="text-left">Capture and Organize Ideas</span>
+      </div>
+      <div class="flex items-center w-full">
+        <svg class="w-6 h-6 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+        </svg>
+        <span class="text-left">Label and Categorize</span>
+      </div>
+      <div class="flex items-center w-full">
+        <svg class="w-6 h-6 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
+        </svg>
+        <span class="text-left">Drag-and-Drop Prioritization</span>
+      </div>
+      <div class="flex items-center w-full">
+        <svg class="w-6 h-6 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+        <span class="text-left">AI-Powered Business Plan Generation</span>
+      </div>
+    </div>
+    <a href="{% url 'register' %}" class="btn btn-lg bg-secondary text-primary hover:bg-opacity-90 border-none rounded-md px-4 sm:px-6 md:px-8 py-2 md:py-3 mt-6 md:mt-8 text-sm sm:text-base md:text-lg font-bold uppercase">
+      Start Organizing Now
+    </a>
+  </div>
+</div>
+
+<div class="bg-base-100 py-8 md:py-16">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-primary">
+      Choose the plan that fits your entrepreneurial journey
+    </h2>
+    <div class="flex flex-col md:flex-row justify-center gap-6 md:gap-8 max-w-2xl mx-auto">
+      <div class="border-2 border-primary p-4 md:p-6 bg-base-100 flex-1">
+        <h3 class="text-lg md:text-xl font-bold mb-2 md:mb-4 text-primary">Basic</h3>
+        <p class="text-sm mb-2 md:mb-4 text-gray-600">Perfect for getting started</p>
+        <p class="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-primary">$9.99/month</p>
+        <ul class="text-left mb-4 md:mb-6">
+          <li class="mb-2 flex items-start">
+            <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Unlimited ideas</span>
+          </li>
+          <li class="mb-2 flex items-start">
+            <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Basic idea management</span>
+          </li>
+          <li class="mb-2 flex items-start">
+            <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Labeling system</span>
+          </li>
+        </ul>
+        <a href="{% url 'register' %}" class="block w-full py-2 px-4 bg-gray-100 text-primary border border-primary hover:bg-gray-200 transition duration-300 text-sm md:text-base font-semibold rounded-md">
+          Choose Basic
+        </a>
+      </div>
+      <div class="border-2 border-primary p-4 md:p-6 bg-base-100 flex-1">
+        <h3 class="text-lg md:text-xl font-bold mb-2 md:mb-4 text-primary">Pro</h3>
+        <p class="text-sm mb-2 md:mb-4 text-gray-600">For serious entrepreneurs</p>
+        <p class="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-primary">$19.99/month</p>
+        <ul class="text-left mb-4 md:mb-6">
+          <li class="mb-2 flex items-start">
+            <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>All Basic features</span>
+          </li>
+          <li class="mb-2 flex items-start">
+            <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>AI-powered business plans</span>
+          </li>
+          <li class="mb-2 flex items-start">
+            <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Priority support</span>
+          </li>
+        </ul>
+        <a href="{% url 'register' %}" class="block w-full py-2 px-4 bg-gray-100 text-primary border border-primary hover:bg-gray-200 transition duration-300 text-sm md:text-base font-semibold rounded-md">
+          Choose Pro
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
