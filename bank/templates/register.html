@@ -1,9 +1,8 @@
 {% extends "landing_base.html" %}
 
 {% block content %}
-<div class="flex items-center justify-center mt-60 min-h-screen py-12">
-    <div class="max-w-md w-full">
-        <div class="w-4/5 mx-auto bg-white rounded-lg shadow-md p-12 border-2 border-primary my-24">
+<div class="container mx-auto px-4 py-8 md:py-16 text-center max-w-md mx-auto my-auto p-12">
+    <div class="w-4/5 mx-auto my-64 bg-white rounded-lg shadow-md p-12 border-2 border-primary">
             <form method="post" class="space-y-4">
                 {% csrf_token %}
                 {% if form.errors %}
@@ -37,7 +36,6 @@
             <div class="mt-4 text-center">
                 <a href="{% url 'login' %}" class="text-sm text-gray-600 hover:underline">Already have an account? Login</a>
             </div>
-        </div>
     </div>
 </div>
 {% endblock %}
