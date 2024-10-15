@@ -12,7 +12,6 @@ import logging
 from django.utils import timezone
 from django.contrib.auth import login, authenticate
 
-# Add this new view
 def home(request):
     if request.user.is_authenticated:
         return redirect('dashboard')

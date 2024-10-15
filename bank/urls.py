@@ -2,9 +2,10 @@ from django.urls import path
 from django.contrib.auth.decorators import login_required
 from . import views
 from . import auth_views
+from django.contrib.auth import views as django_auth_views
 
 urlpatterns = [
-    path('', views.home, name='home'),  # New home view
+    path('', views.home, name='home'), 
     path('dashboard/', login_required(views.dashboard), name='dashboard'),
     path('create/', views.create, name='create'),
     path('update-idea/<int:idea_id>/', views.update_idea, name='update_idea'),
@@ -18,4 +19,8 @@ urlpatterns = [
     path('generate-name/<int:idea_id>/', views.generate_name, name='generate_name'),
     path('generate-plan/<int:idea_id>/', views.generate_plan, name='generate_plan'),
     path('landing/', views.landing_page, name='landing_page'),
+    path('forgot-password/', auth_views.forgot_password_view, name='forgot_password'),
+    path('reset/<uidb64>/<token>/', django_auth_views.PasswordResetConfirmView.as_view(template_name='reset_password_confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', django_auth_views.PasswordResetCompleteView.as_view(template_name='reset_password_complete.html'), name='password_reset_complete'),
+   
 ]
