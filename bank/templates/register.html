@@ -1,8 +1,8 @@
 {% extends "landing_base.html" %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8 md:py-16 text-center max-w-md mx-auto my-auto p-12">
-    <div class="w-4/5 mx-auto my-64 bg-white rounded-lg shadow-md p-12 border-2 border-primary">
+<div class="container mx-auto px-4 md:py-16 text-center max-w-md mx-auto my p-12">
+    <div class="w-4/5 mx-auto bg-white rounded-lg shadow-md p-12 border-2 border-primary">
             <form method="post" class="space-y-4">
                 {% csrf_token %}
                 {% if form.errors %}
@@ -30,7 +30,7 @@
                     <input type="password" name="{{ form.password2.name }}" placeholder="Confirm Password" required class="w-4/5 p-2 border-2 border-primary bg-white text-black rounded text-center">
                 </div>
                 <div class="flex justify-center">
-                    <button type="submit" class="w-2/5 py-2 px-6 bg-primary text-white border-2 border-primary rounded ">Register</button>
+                    <button type="submit" class="w-3/5 py-2 px-6 bg-primary text-white border-2 border-primary rounded  ">Register</button>
                 </div>
             </form>
             <div class="mt-4 text-center">

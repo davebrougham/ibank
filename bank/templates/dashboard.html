@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="bg-error text-secondary-content p-4 mb-4">
+    This should be a matte yellow background with navy text.
+</div>
+
 <div class="overflow-x-auto">
     <table class="table w-full">
         <thead>
@@ -13,7 +17,7 @@
         </thead>
         <tbody id="sortable-ideas">
             {% for idea in ideas %}
-            <tr data-id="{{ idea.id }}" class="hover:bg-gray-700 transition-colors duration-150 ease-in-out cursor-move border-b border-gray-600">
+            <tr data-id="{{ idea.id }}" class=" transition-colors duration-150 ease-in-out cursor-move border-b border-gray-600">
                 <td>{{ idea.name }}</td>
                 <td class="hidden sm:table-cell">{{ idea.description|truncatewords:20 }}</td>
                 <td class="hidden xl:table-cell">

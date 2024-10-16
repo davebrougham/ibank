@@ -29,7 +29,12 @@ module.exports = {
           "primary-content": "#ffffff",
           "secondary-content": "#001F3F",
         },
+        lofi: {
+          ...require("daisyui/src/theming/themes")["lofi"],
+          "error": "#dc2626",
+        }
       },
+      "wire"
     ],
   },
   plugins: [require("daisyui")],

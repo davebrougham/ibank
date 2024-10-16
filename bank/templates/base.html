@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="business">
+<html lang="en" data-theme="{% if user.is_authenticated %}lofi{% else %}ideabank{% endif %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,9 +14,9 @@
     base-uri 'self';
     form-action 'self';"> 
     <title>{% block title %}Idea Bank{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.0/dist/full.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     {% block extra_head %}{% endblock %}
 </head>
@@ -43,12 +43,12 @@
                 </nav>
             </div>
             <nav id="mobile-menu" class="hidden mt-4 sm:hidden">
-                <a href="{% url 'dashboard' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Dashboard</a>
-                <a href="{% url 'create' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Create</a>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary block py-2 px-4 text-sm hover:bg-gray-700">Dashboard</a>
+                <a href="{% url 'create' %}" class="btn btn-secondary block py-2 px-4 text-sm hover:bg-gray-700">Create</a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Logout</a>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary block py-2 px-4 text-sm hover:bg-gray-700">Logout</a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Login</a>
+                    <a href="{% url 'login' %}" class="btn btn-secondary b lock py-2 px-4 text-sm hover:bg-gray-700">Login</a>
                 {% endif %}
             </nav>
         </header>
