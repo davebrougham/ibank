@@ -31,7 +31,7 @@ module.exports = {
         },
         lofi: {
           ...require("daisyui/src/theming/themes")["lofi"],
-          "error": "#dc2626",
+          "error": "red",
         }
       },
       "wire"
