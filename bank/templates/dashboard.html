@@ -1,12 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="bg-error text-secondary-content p-4 mb-4">
-    This should be a matte yellow background with navy text.
-</div>
-
 <div class="overflow-x-auto">
-    <table class="table w-full">
+    <table class="table w-full ">
         <thead>
             <tr>
                 <th class="text-lg font-semibold">Idea</th>
@@ -28,7 +24,7 @@
                 <td class="w-32 sm:w-40">
                     <div class="flex flex-col space-y-2">
                         <a href="{% url 'idea_detail' idea.id %}" class="btn btn-sm btn-primary w-full">View</a>
-                        <button class="btn btn-sm btn-error delete-btn w-full" data-id="{{ idea.id }}">Delete</button>
+                        <button class="btn btn-sm btn-error delete-btn bg-red-600 w-full" data-id="{{ idea.id }}">Delete</button>
                     </div>
                 </td>
             </tr>
